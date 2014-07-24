@@ -4,6 +4,9 @@ function update() {
   // display activity indicator
   document.getElementById("activity").style.display = "inline";
 
+  // clear table
+  document.getElementById("bookmarkstablebody").innerHTML = "";
+
   // start ajax request
   $.ajax({
     type: "GET",
@@ -22,7 +25,12 @@ function getBookmarks() {
     data: "action=getbookmarks",
     statusCode: {
       200: function(response) {
-        updateTableWithBookmarks(response);
+        if (response == "") {
+          // wait one more cycle, for some reason
+          window.setTimeout("getBookmarks()", timeout);
+        }
+        else
+          updateTableWithBookmarks(response);
       },
       202: function() {
         window.setTimeout("getBookmarks()", timeout);

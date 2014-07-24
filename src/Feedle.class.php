@@ -27,6 +27,10 @@ class Feedle {
 
         // call sync server to get an updated list of bookmarks
         Feedle::readBookmarksFromWebAndSaveIt(self::$configuration);
+
+        // tell the client that the file has not yet been fetched
+        // http_response_code(202); // does not work for PHP 5.3.3
+        header(':', true, 202);
       }
       else if ($_GET['action'] == 'getbookmarks') {
         // return the bookmarks from the cached file (or nothing, if there is no file)
