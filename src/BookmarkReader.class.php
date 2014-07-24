@@ -1,16 +1,7 @@
 <?php
 class BookmarkReader {
   public static function readBookmarks() {
-    // read the bookmarks from cache or from the web, if not available (and then cache it)
 
-    if (!file_exists('cache/bookmarks.json')) {
-      // the cached file is not available, read it from the web and save it
-      readBookmarkJsonFromWebAndSaveIt();
-    }
-
-    $json = file_get_contents('cache/bookmarks.json');
-
-    //TODO convert json to bookmarks array
   }
 
 

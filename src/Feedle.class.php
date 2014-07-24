@@ -1,6 +1,7 @@
 <?php
 require_once('src/ConfigLoader.class.php');
 require_once('src/ConfigurationNotFoundException.class.php');
+require_once('src/BookmarkDataStructure.class.php');
 
 class Feedle {
 
@@ -8,6 +9,7 @@ class Feedle {
 
   public static function run() {
     try {
+      // load the credentials
       self::$configuration = ConfigLoader::loadConfiguration();
     }
     catch (ConfigurationNotFoundException $cnfe) {
@@ -17,6 +19,9 @@ class Feedle {
 
 
     $bookmarks = self::readBookmarks();
+
+    self::displayPage($bookmarks);
+
 
 
 
@@ -39,12 +44,15 @@ class Feedle {
 
     if (!file_exists('cache/bookmarks.json')) {
       // the cached file is not available, read it from the web and save it
-      self::readBookmarkJsonFromWebAndSaveIt();
+      readBookmarkJsonFromWebAndSaveIt();
     }
 
     $json = file_get_contents('cache/bookmarks.json');
 
     //TODO convert json to bookmarks array
+    $bds = new BookmarkDataStructure($json);
+
+    return $bds;
   }
 
 
@@ -85,12 +93,34 @@ die();
 
 
 
-
-
-
-
-
-
-
+  private function displayPage($bookmarks) {
+    // do it with echo, later a proper template engine may be more appropriate
+    echo <<<'EOT'
+<html>
+  <head>
+    <title>Bookmarks</title>
+  </head>
+  <body>
+    <h1>Bookmarks</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Hyperlink</th>
+          <th>Tags</th>
+          <th>Keywords</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+EOT;
+    echo $bookmarks->renderHTML();
+    echo <<<'EOT'
+      </tbody>
+    </table>
+  </body>
+</html>
+EOT;
+  }
 }
 ?>
