@@ -25,4 +25,4 @@ Put your credentials in a file called /config/credentials.ini:
 email = youremail
 password = yourpassword
 
-
+The cache folder has to have write permissions for the www-data user (or just "other"): chmod o+w cache/

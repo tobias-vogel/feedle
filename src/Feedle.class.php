@@ -20,6 +20,14 @@ class Feedle {
           echo $cnfe->getMessage() . "<br>\n";
           exit;
         }
+
+        // delete the curretly cached bookmarks file (if present)
+        if (file_exists('cache/bookmarks.json'))
+          unlink('cache/bookmarks.json');
+
+      // the cached file is not available, read it from the web and save it
+//      readBookmarkJsonFromWebAndSaveIt();
+
         // TODO delete current cached bookmarks, call sync server to get an updated list of bookmarks
       }
       else if ($_GET['action'] == 'getbookmarks') {
@@ -40,16 +48,14 @@ class Feedle {
 
 
   private function readBookmarks() {
-    // read the bookmarks from cache or from the web, if not available (and then cache it)
+    // read the bookmarks from cache
+    $json = null;
 
-    if (!file_exists('cache/bookmarks.json')) {
-      // the cached file is not available, read it from the web and save it
-      readBookmarkJsonFromWebAndSaveIt();
+    if (file_exists('cache/bookmarks.json')) {
+      $json = file_get_contents('cache/bookmarks.json');
     }
 
-    $json = file_get_contents('cache/bookmarks.json');
-
-    //TODO convert json to bookmarks array
+    // convert json to bookmarks array
     $bds = new BookmarkDataStructure($json);
 
     return $bds;

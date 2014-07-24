@@ -7,7 +7,7 @@ function update() {
     type: "GET",
     url: "index.php",
     data: "action=updatebookmarks",
-    success: function(response) {}
+//    success: function(response) {}
   });
 
   // start timeout to retrieve the sync data in some seconds
