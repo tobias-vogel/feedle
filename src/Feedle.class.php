@@ -26,12 +26,12 @@ class Feedle {
           unlink('cache/bookmarks.json');
 
         // call sync server to get an updated list of bookmarks
-        readBookmarkJsonFromWebAndSaveIt();
+        Feedle::readBookmarksFromWebAndSaveIt(self::$configuration);
       }
       else if ($_GET['action'] == 'getbookmarks') {
         // return the bookmarks from the cached file (or nothing, if there is no file)
         if (file_exists('cache/bookmarks.json')) {
-          $bookmarks = self::readBookmarks();
+          $bookmarks =  Feedle::readBookmarksFromCache();
           echo $bookmarks->renderHTML();
         }
         else {
@@ -43,7 +43,7 @@ class Feedle {
     }
     else {
       // just display the (possibly) cached bookmarks together with the whole page
-      $bookmarks = self::readBookmarks();
+      $bookmarks = Feedle::readBookmarksFromCache();
       self::displayPage($bookmarks);
     }
 
@@ -54,7 +54,7 @@ class Feedle {
 
 
 
-  private function readBookmarks() {
+  private static function readBookmarksFromCache() {
     // read the bookmarks from cache
     $json = null;
 
@@ -72,17 +72,12 @@ class Feedle {
 
 
 
-  private static function readBookmarkJsonFromWebAndSaveIt() {
+  private static function readBookmarksFromWebAndSaveIt($configuration) {
     // start a process that does query the sync server
-    $command = 'sync-cli.js -e ' . self::$configuration['email'] . ' -p ' . self::$configuration['password'] . ' -t bookmarks';
-
-    $command = 'which ls';
-    exec($command, $output, $xxx);
-
-var_dump($output);
-var_dump($xxx);
-
-die();
+    // $command = 'which ls';
+    // $command = 'sync-cli.js -e ' . self::$configuration['email'] . ' -p ' . self::$configuration['password'] . ' -t bookmarks';
+    $command = "lib/fxa-sync-client/bin/sync-cli.js -e " . $configuration['email'] . " -p " . $configuration['password'] . " -t bookmarks | sed -n -E -e '/::bookmarks::/,$ p' - | sed '1 d' > cache/bookmarks.json";
+    exec($command);
   }
 
 
@@ -93,15 +88,6 @@ die();
 //    var_dump($sync->collection_full($collection));
 //  }
 
-
-
-
-
-
-  // updates the cached bookmarks
-  private function updateCachedBookmarks() {
-    // bookmarks are saved in a flat file with a last-updated flag
-  }
 
 
 
