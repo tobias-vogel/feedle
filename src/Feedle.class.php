@@ -99,8 +99,12 @@ die();
 <html>
   <head>
     <title>Bookmarks</title>
+    <script src="assets/main.js" type="text/javascript"></script>
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
   </head>
   <body>
+    <h1>Control</h1>
+    <span onclick="update()">Retrieve updated sync data</span><span style="display: none" id="activity"> <img src="assets/loader.gif" title="activity indicator"/></span>
     <h1>Bookmarks</h1>
     <table border=1>
       <thead>
