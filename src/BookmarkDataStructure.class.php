@@ -40,7 +40,7 @@ class BookmarkDataStructure {
       $result .= '  <td>' . $item['tags'] . "</td>\n";
       $result .= '  <td>' . $item['keywords'] . "</td>\n";
       $result .= '  <td>' . $item['description'] . "</td>\n";
-      $result .=  "<tr>\n";
+      $result .=  "</tr>\n";
     }
     return $result;
   }

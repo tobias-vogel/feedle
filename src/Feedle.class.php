@@ -85,17 +85,22 @@ class Feedle {
   private function displayPage($bookmarks) {
     // do it with echo, later a proper template engine may be more appropriate
     echo <<<'EOT'
+<!DOCTYPE html>
 <html>
   <head>
     <title>Bookmarks</title>
+    <meta charset="utf-8">
     <script src="assets/main.js" type="text/javascript"></script>
     <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <style type="text/css">
+      th, td { border: 1px solid #000 }
+    </style>
   </head>
   <body>
     <h1>Control</h1>
-    <span onclick="update()">Retrieve updated sync data</span><span style="display: none" id="activity"> <img src="assets/loader.gif" title="activity indicator"/></span>
+    <span onclick="update()">Retrieve updated sync data</span><span style="display: none" id="activity"> <img src="assets/loader.gif" alt="activity indicator"/></span>
     <h1>Bookmarks</h1>
-    <table border=1>
+    <table style="border: 1px solid gray">
       <thead>
         <tr>
           <th>Name</th>
