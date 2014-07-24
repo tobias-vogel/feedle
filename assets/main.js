@@ -1,3 +1,5 @@
+var timeout = 3000;
+
 function update() {
   // display activity indicator
   document.getElementById("activity").style.display = "inline";
@@ -6,10 +8,30 @@ function update() {
   $.ajax({
     type: "GET",
     url: "index.php",
-    data: "action=updatebookmarks",
-//    success: function(response) {}
+    data: "action=updatebookmarks"
   });
 
   // start timeout to retrieve the sync data in some seconds
-  // TODO timeout
+  window.setTimeout("getBookmarks()", timeout);
+}
+
+function getBookmarks() {
+  $.ajax({
+    type: "GET",
+    url: "index.php",
+    data: "action=getbookmarks",
+    statusCode: {
+      200: function(response) {
+        updateTableWithBookmarks(response);
+      },
+      202: function() {
+        window.setTimeout("getBookmarks()", timeout);
+      }
+    }
+  });
+}
+
+function updateTableWithBookmarks(bookmarksHTML) {
+  document.getElementById("bookmarkstablebody").innerHTML = bookmarksHTML;
+  document.getElementById("activity").style.display = "none";
 }

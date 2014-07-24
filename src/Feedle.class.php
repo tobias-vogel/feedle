@@ -25,13 +25,20 @@ class Feedle {
         if (file_exists('cache/bookmarks.json'))
           unlink('cache/bookmarks.json');
 
-      // the cached file is not available, read it from the web and save it
-//      readBookmarkJsonFromWebAndSaveIt();
-
-        // TODO delete current cached bookmarks, call sync server to get an updated list of bookmarks
+        // call sync server to get an updated list of bookmarks
+        readBookmarkJsonFromWebAndSaveIt();
       }
       else if ($_GET['action'] == 'getbookmarks') {
-        // TODO return the bookmarks from the cached file (or nothing, if there is no file)
+        // return the bookmarks from the cached file (or nothing, if there is no file)
+        if (file_exists('cache/bookmarks.json')) {
+          $bookmarks = self::readBookmarks();
+          echo $bookmarks->renderHTML();
+        }
+        else {
+          // tell the client that the file has not yet been fetched
+          // http_response_code(202); // does not work for PHP 5.3.3
+          header(':', true, 202);
+        }
       }
     }
     else {
@@ -122,7 +129,7 @@ die();
           <th>Description</th>
         </tr>
       </thead>
-      <tbody>
+      <tbody id="bookmarkstablebody">
 
 EOT;
     echo $bookmarks->renderHTML();
