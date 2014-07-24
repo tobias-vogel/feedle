@@ -2,24 +2,47 @@
 class BookmarkDataStructure {
   private $structure;
 
-//  function __construct() {
-//    $this->structure = array();
-//  }
-
 
 
 
 
   public function __construct($json = null) {
-    // TODO parse json
-    // put it into an array of hashes
     $this->structure = array();
+
+    if ($json != null) {
+      foreach (json_decode($json, true) as $entry) {
+        // only consider entries that actually are bookmarks
+        if ($entry['type'] == 'bookmark') {
+          $bookmark = array(
+            'name' => $entry['title'],
+            'hyperlink' => $entry['bmkUri'],
+            'tags' => implode(', ', $entry['tags']),
+            'keywords' => $entry['keyword'],
+            'description' => $entry['description']
+          );
+          $this->structure []= $bookmark;
+        }
+      }
+    }
   }
 
 
 
+
+
+
   public function renderHTML() {
-    return "<tr><td>h<td>h<td>h<td>h<td>h</tr>";
+    $result = '';
+    foreach ($this->structure as $item) {
+      $result .=  "<tr>\n";
+      $result .= '  <td>' . $item['name'] . "</td>\n";
+      $result .= '  <td>' . $item['hyperlink'] . "</td>\n";
+      $result .= '  <td>' . $item['tags'] . "</td>\n";
+      $result .= '  <td>' . $item['keywords'] . "</td>\n";
+      $result .= '  <td>' . $item['description'] . "</td>\n";
+      $result .=  "<tr>\n";
+    }
+    return $result;
   }
 }
 ?>

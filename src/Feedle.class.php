@@ -102,7 +102,7 @@ die();
   </head>
   <body>
     <h1>Bookmarks</h1>
-    <table>
+    <table border=1>
       <thead>
         <tr>
           <th>Name</th>
@@ -113,6 +113,7 @@ die();
         </tr>
       </thead>
       <tbody>
+
 EOT;
     echo $bookmarks->renderHTML();
     echo <<<'EOT'
