@@ -5,8 +5,7 @@ require_once('src/Feedle.class.php');
 
 header('Content-Type: text/html; charset=utf-8');
 
-var_dump($_REQUEST);
-Feedle::run();
+Feedle::run($_GET);
 ?>
 
 <!--

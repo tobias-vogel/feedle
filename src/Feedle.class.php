@@ -7,34 +7,34 @@ class Feedle {
 
   private static $configuration;
 
-  public static function run() {
-    try {
-      // load the credentials
-      self::$configuration = ConfigLoader::loadConfiguration();
+  public static function run($_GET) {
+
+    // what we have to do depends on the GET parameters
+    if (isset($_GET['action'])) {
+      if ($_GET['action'] == 'updatebookmarks') {
+        try {
+          // load the credentials
+          self::$configuration = ConfigLoader::loadConfiguration();
+        }
+        catch (ConfigurationNotFoundException $cnfe) {
+          echo $cnfe->getMessage() . "<br>\n";
+          exit;
+        }
+        // TODO delete current cached bookmarks, call sync server to get an updated list of bookmarks
+      }
+      else if ($_GET['action'] == 'getbookmarks') {
+        // TODO return the bookmarks from the cached file (or nothing, if there is no file)
+      }
     }
-    catch (ConfigurationNotFoundException $cnfe) {
-      echo $cnfe->getMessage() . "<br>\n";
-      exit;
+    else {
+      // just display the (possibly) cached bookmarks together with the whole page
+      $bookmarks = self::readBookmarks();
+      self::displayPage($bookmarks);
     }
 
-
-    $bookmarks = self::readBookmarks();
-
-    self::displayPage($bookmarks);
-
-
-
-
-    /*
-      Workflow:
-      1. check for last update, if older than a day, retrieve feed list
-      2. update feed contents
-   */
-
-//    $this->readFeedsFromSync();
-    //is_dir("caches/" . $this->configuration['username']);
-//    var_dump($this->configuration);
+    //TODO include something for the feeds
   }
+
 
 
 
