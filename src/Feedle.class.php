@@ -27,10 +27,6 @@ class Feedle {
 
         // call sync server to get an updated list of bookmarks
         Feedle::readBookmarksFromWebAndSaveIt(self::$configuration);
-
-        // tell the client that the file has not yet been fetched
-        // http_response_code(202); // does not work for PHP 5.3.3
-        header(':', true, 202);
       }
       else if ($_GET['action'] == 'getbookmarks') {
         // return the bookmarks from the cached file (or nothing, if there is no file)
@@ -78,19 +74,9 @@ class Feedle {
 
   private static function readBookmarksFromWebAndSaveIt($configuration) {
     // start a process that does query the sync server
-    // $command = 'which ls';
-    // $command = 'sync-cli.js -e ' . self::$configuration['email'] . ' -p ' . self::$configuration['password'] . ' -t bookmarks';
     $command = "lib/fxa-sync-client/bin/sync-cli.js -e " . $configuration['email'] . " -p " . $configuration['password'] . " -t bookmarks | sed -n -E -e '/::bookmarks::/,$ p' - | sed '1 d' > cache/bookmarks.json";
     exec($command);
   }
-
-
-
-
-//  private function readFeedsFromSync() {
-//    $sync = new Firefox_Sync($this->configuration['username'], $this->configuration['password'], $this->configuration['synckey'], $this->configuration['syncnode']);
-//    var_dump($sync->collection_full($collection));
-//  }
 
 
 
