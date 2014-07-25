@@ -1,3 +1,4 @@
 [submodule "lib/fxa-sync-client"]
 	path = lib/fxa-sync-client
 	url = https://github.com/edmoz/fxa-sync-client.git
+	ignore = dirty
