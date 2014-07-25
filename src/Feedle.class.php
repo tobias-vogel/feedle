@@ -98,7 +98,7 @@ class Feedle {
   </head>
   <body>
     <h1>Control</h1>
-    <span onclick="update()">Retrieve updated sync data</span><span style="display: none" id="activity"> <img src="assets/loader.gif" alt="activity indicator"/></span>
+    <button onclick="update()">Retrieve updated sync data</button><span style="display: none" id="activity"> <img src="assets/loader.gif" alt="activity indicator"/></span>
     <h1>Bookmarks</h1>
     <table style="border: 1px solid gray">
       <thead>
