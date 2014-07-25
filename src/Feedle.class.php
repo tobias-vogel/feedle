@@ -92,6 +92,7 @@ class Feedle {
     <meta charset="utf-8">
     <script src="assets/main.js" type="text/javascript"></script>
     <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <link href="assets/favicon.ico" rel="icon" type="image/x-icon" />
     <style type="text/css">
       th, td { border: 1px solid #000 }
     </style>
