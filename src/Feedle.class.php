@@ -21,7 +21,7 @@ class Feedle {
           exit;
         }
 
-        // delete the curretly cached bookmarks file (if present)
+        // delete the currently cached bookmarks file (if present)
         if (file_exists('cache/bookmarks.json'))
           unlink('cache/bookmarks.json');
 
@@ -33,11 +33,13 @@ class Feedle {
         if (file_exists('cache/bookmarks.json')) {
           $bookmarks =  Feedle::readBookmarksFromCache();
           echo $bookmarks->renderHTML();
+          return;
         }
         else {
           // tell the client that the file has not yet been fetched
           // http_response_code(202); // does not work for PHP 5.3.3
           header(':', true, 202);
+          return;
         }
       }
     }
