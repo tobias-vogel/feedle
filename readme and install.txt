@@ -9,22 +9,63 @@ It works with the (currently new) firefox sync 1.5, which uses firefox accounts 
 Installation
 ============
 
-The tool needs client functionality to connect to firefox sync. This functionality is provided by the github tool "fxa-sync-client" written by Edwin Wong (edmoz).
-This client bases on npm (node.js package manager) which in turn bases on node.js. In particular, it requires a version 0.10.x.
-In the /lib folder, there is a git submodule with the fxa-sync-client, which has to be checked out as well. (See http://git-scm.com/book/en/Git-Tools-Submodules or in German http://git-scm.com/book/de/Git-Tools-Submodule) In case it does not work anymore (updates might have destroyed compatibility to the rest of this tool) or github is not available or it has moved or…, a copy of it in the currently working version (at time of writing) is located under "/lib/_cached dependencies". It would have to be extraced and placed into the /lib/fxa-sync-client folder.
+The installation requires some steps. They are accompanied with shell commands.
+I assume that you have a working system with apache2 and git installed and php enabled.
 
-The client fxa-sync-client has to be installed. Before this can be done, an appropriate node.js installation has to be prepared. If you have one installed, you can just skip this step and try it out, but otherwise or to play it safe, you should download the appropriate 0.10.x release of node.js and put it into /lib/node.js. Download it from http://blog.nodejs.org/release/ or take the copy located in "/lib/_cached dependencies" working for Linux 64 Bit (currently using Ubuntu 10.10 64 bit). In this directory, there is a bin subdirectory containing a node and a npm executable (or symlink or whatever).
+Create a directory for feedle.
 
-You are now ready to install fxa-sync-client issueing a "sudo /path/to/your/custom/node.js/installation/npm install" when being in the /lib/fxa-sync-client directory.
-When the installation succeeded, try the follwing command from /lib/fxa-sync-client/bin using your firefox sync credentials:
+sudo mkdir -r /var/www/feedle
+
+This directory should not have root restrictions, but belong to the current user.
+
+cd /var/www/feedle
+sudo chown `whoami` .
+sudo chgrp `whoami` .
+
+Now, feedle can be cloned into this directory.
+
+git clone https://github.com/tobias-vogel/feedle.git .
+
+For the webserver to write cached files, the cache directory access rights have to be changed appropriately.
+
+cd chmod o+w cache
+
+Now we start with the (not too) tough part. 
+Feedle needs client functionality to connect to firefox sync. This functionality is provided by the github tool "fxa-sync-client" written by Edwin Wong (edmoz).
+This client bases on npm (node.js package manager) which in turn bases on node.js. In particular, at time of writing, it requires a version 0.10.x.
+In the /lib directory, there are two git submodules, node.js and the fxa-sync-client. (See http://git-scm.com/book/en/Git-Tools-Submodules)
+Both have to be checked out and built/installed.
+We start with initializing these submodules. That actually downloads them, they are not cloned automatically.
+
+git submodule init
+git submodule update
+
+We first build node.js. We have to checkout an appropriate version and build it.
+
+cd lib/node.js
+git checkout v0.10.29
+./configure
+make #takes some minutes
+sudo make install
+
+The tutorial I used (https://ariejan.net/2011/10/24/installing-node-js-and-npm-on-ubuntu-debian/) says that npm also needs to be installed. For unknown reasons, not in my case.
+
+#curl https://npmjs.org/install.sh | sudo sh   # install npm, however for me, that was not necessary, it is already included
+
+You are now ready to install (i.e., configure) fxa-sync-client.
+
+cd ../fxa-sync-client
+sudo ../node.js/bin/npm install
+
+When the installation succeeded, try the following command from /lib/fxa-sync-client/bin using your firefox sync credentials (It should give you a longly output, ending with a lot of json containing your bookmarks.):
+
 sync-cli.js -e myemailaddress -p mypassword -t bookmarks
-
-It should give you a longly output, ending with a lot of json containing your bookmarks.
-
-Moreover, you need a PHP installation.
 
 Put your sync credentials in a file called /config/credentials.ini:
 email = youremail
 password = yourpassword
 
-The cache folder has to have write permissions for the www-data user (or just "other"): chmod o+w cache/
+cd ../../config
+joe credentials.ini # or any other editor of your choice
+
+You should now add a .htaccess to the project to secure the contents from eavesdroppers.

@@ -2,3 +2,7 @@
 	path = lib/fxa-sync-client
 	url = https://github.com/edmoz/fxa-sync-client.git
 	ignore = dirty
+[submodule "lib/node.js"]
+	path = lib/node.js
+	url = https://github.com/joyent/node.git
+        ignore = dirty
