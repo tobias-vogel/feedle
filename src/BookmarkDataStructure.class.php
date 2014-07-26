@@ -36,7 +36,7 @@ class BookmarkDataStructure {
     foreach ($this->structure as $item) {
       $result .=  "<tr>\n";
       $result .= '  <td>' . $item['name'] . "</td>\n";
-      $result .= '  <td>' . $item['hyperlink'] . "</td>\n";
+      $result .= '  <td>< href="' . $item['hyperlink'] . '">' . $item['hyperlink'] . "</a></td>\n";
       $result .= '  <td>' . $item['tags'] . "</td>\n";
       $result .= '  <td>' . $item['keywords'] . "</td>\n";
       $result .= '  <td>' . $item['description'] . "</td>\n";
