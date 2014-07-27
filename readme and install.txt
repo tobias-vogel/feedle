@@ -48,9 +48,27 @@ git checkout v0.10.29
 make #takes some minutes
 sudo make install
 
+Node.js should now work. The following command should print the version:
+
+node -v
+
+If it did not work, download a pre-compiled v0.10.29 release from http://nodejs.org/dist/v0.10.29/, extract it and you are done.
+
 The tutorial I used (https://ariejan.net/2011/10/24/installing-node-js-and-npm-on-ubuntu-debian/) says that npm also needs to be installed. For unknown reasons, not in my case.
+Try npm with the following command, which should print the version:
+
+npm -v
+
+If it does not work, install it in the following way (commented out, here):
 
 #curl https://npmjs.org/install.sh | sudo sh   # install npm, however for me, that was not necessary, it is already included
+
+However, this command did not work, download install.sh with the following command:
+
+cd ..
+wget --no-check-certificate https://npmjs.org/install.sh
+chmod u+x install.sh
+sudo ./install.sh
 
 You are now ready to install (i.e., configure) fxa-sync-client.
 
