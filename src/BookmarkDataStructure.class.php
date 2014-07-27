@@ -13,13 +13,13 @@ class BookmarkDataStructure {
       foreach (json_decode($json, true) as $entry) {
         // only consider entries that actually are bookmarks
         if ($entry['type'] == 'bookmark') {
-          $bookmark = array(
-            'name' => $entry['title'],
-            'hyperlink' => $entry['bmkUri'],
-            'tags' => implode(', ', $entry['tags']),
-            'keywords' => $entry['keyword'],
-            'description' => $entry['description']
-          );
+          $bookmark = array();
+          $bookmark['name'] = $entry['title'];
+          $bookmark['hyperlink'] = $entry['bmkUri'];
+          $bookmark['description'] = $entry['description'];
+          // merge tags and keywords (what's the difference?)
+          $bookmark['tags'] = array_merge(count($entry['tags']) > 0 ? explode(' ', implode(' ', $entry['tags'])) : array(), ($entry['keyword'] == null ? array() : explode(' ', $entry['keyword'])));
+
           $this->structure []= $bookmark;
         }
       }
@@ -34,14 +34,19 @@ class BookmarkDataStructure {
   public function renderHTML() {
     $result = '';
     foreach ($this->structure as $item) {
-      $result .=  "<tr>\n";
-      $result .= '  <td>' . $item['name'] . "</td>\n";
-      $result .= '  <td><a href="' . $item['hyperlink'] . '">' . $item['hyperlink'] . "</a></td>\n";
-      $result .= '  <td>' . $item['tags'] . "</td>\n";
-      $result .= '  <td>' . $item['keywords'] . "</td>\n";
-      $result .= '  <td>' . $item['description'] . "</td>\n";
-      $result .=  "</tr>\n";
-    }
+
+      $result .= '<li>' . "\n";
+      $result .= '  <div class="title">' .  $item['name'] . "</div>\n";
+      $result .= '  <div class="hyperlink"><a href="' . $item['hyperlink'] . '">' . $item['hyperlink'] . "</a></div>\n";
+      $result .= '  <ul class="tags">' . "\n";
+      if (count($item['tags']) > 0) {
+        foreach ($item['tags'] as $tag) {
+          $result .= '    <li class="tag">' . $tag . "</li>\n";
+        }
+      }
+      $result .= "  </ul>\n";  
+      $result .= '  <div class="description">' . $item['description'] . "</div>\n";
+      $result .= "</li>\n";
     return $result;
   }
 }

@@ -96,30 +96,21 @@ class Feedle {
     <script src="http://code.jquery.com/jquery-latest.js"></script>
     <link href="assets/favicon.ico" rel="icon" type="image/x-icon" />
     <style type="text/css">
-      th, td { border: 1px solid #000 }
+      li {margin-bottom: 20px; border-color: black; border-width: thin; border-style: solid}
+      li.tag {background-color: yellow; display: inline}
     </style>
   </head>
   <body>
     <h1>Control</h1>
     <button onclick="update()">Retrieve updated sync data</button><span style="display: none" id="activity"> <img src="assets/loader.gif" alt="activity indicator"/></span>
     <h1>Bookmarks</h1>
-    <table style="border: 1px solid gray">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Hyperlink</th>
-          <th>Tags</th>
-          <th>Keywords</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody id="bookmarkstablebody">
+    <ul style="list-style: none; -moz-padding-start: 0px;">
 
 EOT;
     echo $bookmarks->renderHTML();
     echo <<<'EOT'
-      </tbody>
-    </table>
+    
+    </ul>
   </body>
 </html>
 EOT;
