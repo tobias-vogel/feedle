@@ -33,6 +33,7 @@ class BookmarkDataStructure {
 
   public function renderHTML() {
     $result = '';
+
     foreach ($this->structure as $item) {
 
       $result .= '<li>' . "\n";
@@ -47,6 +48,7 @@ class BookmarkDataStructure {
       $result .= "  </ul>\n";  
       $result .= '  <div class="description">' . $item['description'] . "</div>\n";
       $result .= "</li>\n";
+    }
     return $result;
   }
 }
