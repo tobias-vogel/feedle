@@ -94,11 +94,8 @@ class Feedle {
     <meta charset="utf-8">
     <script src="assets/main.js" type="text/javascript"></script>
     <script src="http://code.jquery.com/jquery-latest.js"></script>
-    <link href="assets/favicon.ico" rel="icon" type="image/x-icon" />
-    <style type="text/css">
-      li {margin-bottom: 20px; border-color: black; border-width: thin; border-style: solid}
-      li.tag {background-color: yellow; display: inline}
-    </style>
+    <link href="assets/style.css" rel="stylesheet" type="text/css"/>
+    <link href="assets/favicon.ico" rel="icon" type="image/x-icon"/>
   </head>
   <body>
     <h1>Control</h1>
