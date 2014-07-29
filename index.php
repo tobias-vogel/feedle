@@ -5,11 +5,6 @@ require_once('src/Feedle.class.php');
 
 header('Content-Type: text/html; charset=utf-8');
 
-Feedle::run($_GET);
-
-/*
-
-TODO:
-- set up htaccess
-*/
+// consider only the parameters from the corresponding HTTP method
+Feedle::run($_SERVER['REQUEST_METHOD'] == 'GET' ? $_GET : $_POST);
 ?>

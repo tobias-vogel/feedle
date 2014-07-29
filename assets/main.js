@@ -12,9 +12,9 @@ function update() {
 
   // start ajax request
   $.ajax({
-    type: "GET",
+    type: "POST",
     url: "index.php",
-    data: "action=updatebookmarks"
+    data: "action=retrievebookmarksfromsyncserver"
   });
 
   // start timeout to retrieve the sync data in some seconds
@@ -28,14 +28,9 @@ function getBookmarks() {
     data: "action=getbookmarks",
     statusCode: {
       200: function(response) {
-        if (response == "") {
-          // wait one more cycle, for some reason
-          window.setTimeout("getBookmarks()", timeout);
-        }
-        else
-          updateTableWithBookmarks(response);
+        updateTableWithBookmarks(response);
       },
-      202: function() {
+      204: function() {
         window.setTimeout("getBookmarks()", timeout);
       }
     }

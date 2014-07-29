@@ -7,11 +7,10 @@ class Feedle {
 
   private static $configuration;
 
-  public static function run($_GET) {
-
-    // what we have to do depends on the GET parameters
-    if (isset($_GET['action'])) {
-      if ($_GET['action'] == 'updatebookmarks') {
+  public static function run($parameters) {
+    // what we have to do depends on the parameters
+    if (isset($parameters['action'])) {
+      if ($parameters['action'] == 'retrievebookmarksfromsyncserver') {
         try {
           // load the credentials
           self::$configuration = ConfigLoader::loadConfiguration();
@@ -22,24 +21,24 @@ class Feedle {
         }
 
         // delete the currently cached bookmarks file (if present)
-        if (file_exists('cache/bookmarks.json'))
+        if (file_exists('cache/bookmarks.json')) {
           unlink('cache/bookmarks.json');
+          unlink('cache/.completed');
+        }
 
         // call sync server to get an updated list of bookmarks
         Feedle::readBookmarksFromWebAndSaveIt(self::$configuration);
       }
-      else if ($_GET['action'] == 'getbookmarks') {
+      else if ($parameters['action'] == 'getbookmarks') {
         // return the bookmarks from the cached file (or nothing, if there is no file)
-        if (file_exists('cache/bookmarks.json')) {
+        if (file_exists('cache/.completed')) {
           $bookmarks =  Feedle::readBookmarksFromCache();
           echo $bookmarks->renderHTML();
-          return;
         }
         else {
           // tell the client that the file has not yet been fetched
-          // http_response_code(202); // does not work for PHP 5.3.3
-          header(':', true, 202);
-          return;
+          // http_response_code(204); // does not work for PHP 5.3.3
+          header(':', true, 204);
         }
       }
     }
@@ -76,7 +75,7 @@ class Feedle {
 
   private static function readBookmarksFromWebAndSaveIt($configuration) {
     // start a process that does query the sync server
-    $command = "lib/fxa-sync-client/bin/sync-cli.js -e " . $configuration['email'] . " -p " . $configuration['password'] . " -t bookmarks | sed -n -E -e '/::bookmarks::/,$ p' - | sed '1 d' > cache/bookmarks.json";
+    $command = "lib/fxa-sync-client/bin/sync-cli.js -e " . $configuration['email'] . " -p " . $configuration['password'] . " -t bookmarks | sed -n -E -e '/::bookmarks::/,$ p' - | sed '1 d' > cache/bookmarks.json && touch cache/.completed";
     exec($command);
   }
 
@@ -93,7 +92,7 @@ class Feedle {
     <title>Bookmarks</title>
     <meta charset="utf-8">
     <script src="assets/main.js" type="text/javascript"></script>
-    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
     <link href="assets/style.css" rel="stylesheet" type="text/css"/>
     <link href="assets/favicon.ico" rel="icon" type="image/x-icon"/>
   </head>

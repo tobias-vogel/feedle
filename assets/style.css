@@ -1,3 +1,8 @@
+@viewport {
+	width: device-width;
+}
+
+
 li {margin-bottom: 20px; border-color: black; border-width: thin; border-style: solid}
 li.tag {background-color: yellow; display: inline}
 
