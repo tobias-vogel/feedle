@@ -4,8 +4,11 @@ function update() {
   // display activity indicator
   document.getElementById("activity").style.display = "inline";
 
-  // clear table
-  document.getElementById("bookmarkstablebody").innerHTML = "";
+  // deactivate button
+  $("#updatebutton").attr("disabled", "disabled");
+
+  // clear list
+  document.getElementById("bookmarkslist").innerHTML = "";
 
   // start ajax request
   $.ajax({
@@ -40,6 +43,7 @@ function getBookmarks() {
 }
 
 function updateTableWithBookmarks(bookmarksHTML) {
-  document.getElementById("bookmarkstablebody").innerHTML = bookmarksHTML;
+  document.getElementById("bookmarkslist").innerHTML = bookmarksHTML;
   document.getElementById("activity").style.display = "none";
+  $("#updatebutton").removeAttr("disabled");
 }
