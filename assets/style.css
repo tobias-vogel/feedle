@@ -1,8 +1,22 @@
-@viewport {
-	width: device-width;
+#bookmarkslist {
+  list-style: none;
+  -moz-padding-start: 0px;
 }
 
+#bookmarkslist li {
+  margin-bottom: 20px;
+  border-color: black;
+  border-width: thin;
+  border-style: solid;
+  min-width: 320px;
+  max-width: 400px;
+}
 
-li {margin-bottom: 20px; border-color: black; border-width: thin; border-style: solid}
-li.tag {background-color: yellow; display: inline}
+li.tag {
+  background-color: yellow;
+  display: inline
+}
 
+li div.hyperlink a {
+  word-wrap: break-word;
+}

@@ -45,7 +45,7 @@ class BookmarkDataStructure {
           $result .= '    <li class="tag">' . $tag . "</li>\n";
         }
       }
-      $result .= "  </ul>\n";  
+      $result .= "  </ul>\n";
       $result .= '  <div class="description">' . $item['description'] . "</div>\n";
       $result .= "</li>\n";
     }

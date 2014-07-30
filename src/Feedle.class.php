@@ -100,7 +100,7 @@ class Feedle {
     <h1>Control</h1>
     <button id="updatebutton" onclick="update()">Retrieve updated sync data</button><span style="display: none" id="activity"> <img src="assets/loader.gif" alt="activity indicator"/></span>
     <h1>Bookmarks</h1>
-    <ul id="bookmarkslist" style="list-style: none; -moz-padding-start: 0px;">
+    <ul id="bookmarkslist">
 
 EOT;
     echo $bookmarks->renderHTML();
