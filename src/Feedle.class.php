@@ -99,6 +99,7 @@ class Feedle {
     <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
     <link href="assets/style.css" rel="stylesheet" type="text/css"/>
     <link href="assets/favicon.ico" rel="icon" type="image/x-icon"/>
+    <meta name="viewport" content="width=device-width"/>
   </head>
   <body>
     <h1>Control</h1>

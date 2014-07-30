@@ -1,6 +1,6 @@
 #bookmarkslist {
   list-style: none;
-  -moz-padding-start: 0px;
+  padding-left: 0px;
 }
 
 #bookmarkslist li {
@@ -17,6 +17,6 @@ li.tag {
   display: inline
 }
 
-li div.hyperlink a {
+li div.hyperlink a, li div.title {
   word-wrap: break-word;
 }
