@@ -11,6 +11,10 @@ class Feedle {
     // what we have to do depends on the parameters
     if (isset($parameters['action'])) {
       if ($parameters['action'] == 'retrievebookmarksfromsyncserver') {
+        // if an update is currently running, do nothing
+        if (file_exists('cache/.inprogress'))
+          return;
+
         try {
           // load the credentials
           self::$configuration = ConfigLoader::loadConfiguration();
@@ -21,10 +25,10 @@ class Feedle {
         }
 
         // delete the currently cached bookmarks file (if present)
-        if (file_exists('cache/bookmarks.json')) {
-          unlink('cache/bookmarks.json');
-          unlink('cache/.completed');
-        }
+        //if (file_exists('cache/bookmarks.json')) {
+        //  unlink('cache/bookmarks.json');
+        //  unlink('cache/.completed');
+        //}
 
         // call sync server to get an updated list of bookmarks
         Feedle::readBookmarksFromWebAndSaveIt(self::$configuration);
@@ -59,7 +63,7 @@ class Feedle {
     // read the bookmarks from cache
     $json = null;
 
-    if (file_exists('cache/bookmarks.json')) {
+    if (file_exists('cache/bookmarks.json') && file_exists('cache/.completed')) {
       $json = file_get_contents('cache/bookmarks.json');
     }
 
@@ -75,7 +79,7 @@ class Feedle {
 
   private static function readBookmarksFromWebAndSaveIt($configuration) {
     // start a process that does query the sync server
-    $command = "lib/fxa-sync-client/bin/sync-cli.js -e " . $configuration['email'] . " -p " . $configuration['password'] . " -t bookmarks | sed -n -E -e '/::bookmarks::/,$ p' - | sed '1 d' > cache/bookmarks.json && touch cache/.completed";
+    $command = "rm cache/.completed; touch cache/.inprogress && lib/fxa-sync-client/bin/sync-cli.js -e " . $configuration['email'] . " -p " . $configuration['password'] . " -t bookmarks | sed -n -E -e '/::bookmarks::/,$ p' - | sed '1 d' > cache/bookmarks.json && touch cache/.completed && rm cache/.inprogress";
     exec($command);
   }
 
