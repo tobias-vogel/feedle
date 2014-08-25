@@ -1,12 +1,14 @@
 <?php
 class BookmarkDataStructure {
   private $structure;
+  private $timestamp;
 
 
 
 
 
-  public function __construct($json = null) {
+  public function __construct($json = null, $timestamp = null) {
+    $this->timestamp = $timestamp;
     $this->structure = array();
 
     if ($json != null) {
@@ -50,6 +52,14 @@ class BookmarkDataStructure {
       $result .= "</li>\n";
     }
     return $result;
+  }
+
+
+
+
+
+  public function getTimestamp() {
+    return strftime('%c', $this->timestamp);
   }
 }
 ?>

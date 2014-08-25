@@ -62,13 +62,15 @@ class Feedle {
   private static function readBookmarksFromCache() {
     // read the bookmarks from cache
     $json = null;
+    $timestamp = null;
 
     if (file_exists('cache/bookmarks.json') && file_exists('cache/.completed')) {
       $json = file_get_contents('cache/bookmarks.json');
+      $timestamp = filemtime('cache/bookmarks.json');
     }
 
     // convert json to bookmarks array
-    $bds = new BookmarkDataStructure($json);
+    $bds = new BookmarkDataStructure($json, $timestamp);
 
     return $bds;
   }
@@ -105,6 +107,11 @@ class Feedle {
     <h1>Control</h1>
     <button id="updatebutton" onclick="update()">Retrieve updated sync data</button><span style="display: none" id="activity"> <img src="assets/loader.gif" alt="activity indicator"/></span>
     <h1>Bookmarks</h1>
+
+EOT;
+    echo 'Updated: ' . $bookmarks->getTimestamp();
+    echo <<<'EOT'
+
     <ul id="bookmarkslist">
 
 EOT;
