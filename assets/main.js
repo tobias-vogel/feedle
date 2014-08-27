@@ -42,3 +42,10 @@ function updateTableWithBookmarks(bookmarksHTML) {
   document.getElementById("activity").style.display = "none";
   $("#updatebutton").removeAttr("disabled");
 }
+
+function toggleOpenInNewTab() {
+  var openInNewTab = document.getElementById("openinnewtabtoggle").checked;
+  $('ul#bookmarkslist li div.hyperlink a').each(function(index) {
+    this.target = (openInNewTab ? "_blank" : "_self");
+  });
+}

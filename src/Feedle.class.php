@@ -111,7 +111,9 @@ class Feedle {
 EOT;
     echo 'Updated: ' . $bookmarks->getTimestamp();
     echo <<<'EOT'
-
+    <br>
+    <input type="checkbox" id="openinnewtabtoggle" onclick="toggleOpenInNewTab();">
+    <label for="openinnewtabtoggle">Open links in new Tab</label>
     <ul id="bookmarkslist">
 
 EOT;
