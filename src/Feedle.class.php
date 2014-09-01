@@ -104,23 +104,31 @@ class Feedle {
     <meta name="viewport" content="width=device-width"/>
   </head>
   <body>
-    <h1>Control</h1>
-    <button id="updatebutton" onclick="update()">Retrieve updated sync data</button><span style="display: none" id="activity"> <img src="assets/loader.gif" alt="activity indicator"/></span>
-    <h1>Bookmarks</h1>
+    <span onclick="activateBookmarksTab()">Bookmarks</span>
+    <span onclick="activateFeedsTab()">Feeds</span>
+    <div id="bookmarkstab">
+      <h1>Control</h1>
+      <button id="updatebutton" onclick="update()">Retrieve updated sync data</button><span style="display: none" id="activity"> <img src="assets/loader.gif" alt="activity indicator"/></span>
+      <h1>Bookmarks</h1>
 
 EOT;
-    echo 'Updated: ' . $bookmarks->getTimestamp();
-    echo <<<'EOT'
-    <br>
-    <input type="checkbox" id="openinnewtabtoggle" onclick="toggleOpenInNewTab();">
-    <label for="openinnewtabtoggle">Open links in new Tab</label>
-    <ul id="bookmarkslist">
+      echo 'Updated: ' . $bookmarks->getTimestamp();
+      echo <<<'EOT'
+      <br>
+      <input type="checkbox" id="openinnewtabtoggle" onclick="toggleOpenInNewTab();">
+      <label for="openinnewtabtoggle">Open links in new Tab</label>
+      <ul id="bookmarkslist">
 
 EOT;
-    echo $bookmarks->renderHTML();
-    echo <<<'EOT'
+      echo $bookmarks->renderHTML();
+      echo <<<'EOT'
     
-    </ul>
+      </ul>
+    </div>
+    <div id="feedstab" style="display: none;">
+      <h1>Feeds</h1>
+      feeds go here...
+    </div>
   </body>
 </html>
 EOT;

@@ -49,3 +49,13 @@ function toggleOpenInNewTab() {
     this.target = (openInNewTab ? "_blank" : "_self");
   });
 }
+
+function activateBookmarksTab() {
+  document.getElementById("bookmarkstab").style.display = "block";
+  document.getElementById("feedstab").style.display = "none";
+}
+
+function activateFeedsTab() {
+  document.getElementById("bookmarkstab").style.display = "none";
+  document.getElementById("feedstab").style.display = "block";
+}
