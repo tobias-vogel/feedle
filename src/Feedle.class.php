@@ -2,6 +2,7 @@
 require_once('src/ConfigLoader.class.php');
 require_once('src/ConfigurationNotFoundException.class.php');
 require_once('src/BookmarkDataStructure.class.php');
+require_once('src/FeedDataStructure.class.php');
 
 class Feedle {
 
@@ -24,20 +25,27 @@ class Feedle {
           exit;
         }
 
-        // delete the currently cached bookmarks file (if present)
-        //if (file_exists('cache/bookmarks.json')) {
-        //  unlink('cache/bookmarks.json');
-        //  unlink('cache/.completed');
-        //}
-
         // call sync server to get an updated list of bookmarks
         Feedle::readBookmarksFromWebAndSaveIt(self::$configuration);
       }
       else if ($parameters['action'] == 'getbookmarks') {
         // return the bookmarks from the cached file (or nothing, if there is no file)
         if (file_exists('cache/.completed')) {
-          $bookmarks =  Feedle::readBookmarksFromCache();
+          $bookmarks = Feedle::readBookmarksFromCache();
           echo $bookmarks->renderHTML();
+        }
+        else {
+          // tell the client that the file has not yet been fetched
+          // http_response_code(204); // does not work for PHP 5.3.3
+          header(':', true, 204);
+        }
+      }
+      else if ($parameters['action'] == 'getfeeds') {
+        // return the feeds from the cached file (or nothing, if there is no file)
+        if (file_exists('cache/.completed')) {
+          $bookmarks = Feedle::readBookmarksFromCache();
+          $feeds = $bookmarks->filterFeeds();
+          echo $feeds->renderHTML();
         }
         else {
           // tell the client that the file has not yet been fetched
@@ -48,11 +56,12 @@ class Feedle {
     }
     else {
       // just display the (possibly) cached bookmarks together with the whole page
-      $bookmarks = Feedle::readBookmarksFromCache();
-      self::displayPage($bookmarks);
+      list($bookmarks, $feeds) = Feedle::readBookmarksFromCache();
+      //$feeds = $bookmarks->filterFeeds();
+//var_dump($feeds);
+//die();
+      self::displayPage($bookmarks, $feeds);
     }
-
-    //TODO include something for the feeds
   }
 
 
@@ -69,10 +78,39 @@ class Feedle {
       $timestamp = filemtime('cache/bookmarks.json');
     }
 
-    // convert json to bookmarks array
-    $bds = new BookmarkDataStructure($json, $timestamp);
+    // convert json to bookmarks and feeds
+    $bds = new BookmarkDataStructure($timestamp);
+    $fds = new FeedDataStructure();
 
-    return $bds;
+    if ($json != null) {
+      foreach (json_decode($json, true) as $entry) {
+
+        // only consider entries that actually are bookmarks or feeds
+        if ($entry['type'] == 'bookmark' or $entry['type'] == 'livemark') {
+          $name = $entry['title'];
+
+          if ($entry['type'] == 'bookmark') {
+            // read all bookmark specific details
+            $hyperlink = $entry['bmkUri'];
+            $description = $entry['description'];
+            // merge tags and keywords (what's the difference?)
+            $tags = array_merge(count($entry['tags']) > 0 ? explode(' ', implode(' ', $entry['tags'])) : array(), ($entry['keyword'] == null ? array() : explode(' ', $entry['keyword'])));
+
+            // add this bookmark
+            $bds->addBookmark($name, $hyperlink, $description, $tags);
+          }
+          else {
+            // read all feed specific details
+            $feedUri = $entry['feedUri'];
+            $id = $entry['id'];
+
+            // add this feed
+            $fds->addFeed($name, $feedUri, $id);
+          }
+        }
+      }
+    }
+    return array($bds, $fds);
   }
 
 
@@ -89,7 +127,7 @@ class Feedle {
 
 
 
-  private function displayPage($bookmarks) {
+  private function displayPage($bookmarks, $feeds) {
     // do it with echo, later a proper template engine may be more appropriate
     echo <<<'EOT'
 <!DOCTYPE html>
@@ -104,11 +142,12 @@ class Feedle {
     <meta name="viewport" content="width=device-width"/>
   </head>
   <body>
+    <h1>Control</h1>
+    <button id="updatebutton" onclick="updateBookmarks()">Retrieve updated sync data</button><span style="display: none" id="activity"> <img src="assets/loader.gif" alt="activity indicator"/></span>
+    <br>
     <span onclick="activateBookmarksTab()">Bookmarks</span>
     <span onclick="activateFeedsTab()">Feeds</span>
     <div id="bookmarkstab">
-      <h1>Control</h1>
-      <button id="updatebutton" onclick="update()">Retrieve updated sync data</button><span style="display: none" id="activity"> <img src="assets/loader.gif" alt="activity indicator"/></span>
       <h1>Bookmarks</h1>
 
 EOT;
@@ -125,9 +164,14 @@ EOT;
     
       </ul>
     </div>
-    <div id="feedstab" style="display: none;">
+    <div id="feedstab" style="xdisplay: none;">
       <h1>Feeds</h1>
-      feeds go here...
+      <ul id="feedlist">
+
+EOT;
+      echo $feeds->renderHTML();
+      echo <<<'EOT'
+      </ul>
     </div>
   </body>
 </html>

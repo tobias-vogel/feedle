@@ -1,33 +1,28 @@
 <?php
 class BookmarkDataStructure {
-  private $structure;
+  private $structure = array();
   private $timestamp;
 
 
 
 
 
-  public function __construct($json = null, $timestamp = null) {
+  public function __construct($timestamp) {
     $this->timestamp = $timestamp;
-    $this->structure = array();
-
-    if ($json != null) {
-      foreach (json_decode($json, true) as $entry) {
-        // only consider entries that actually are bookmarks
-        if ($entry['type'] == 'bookmark') {
-          $bookmark = array();
-          $bookmark['name'] = $entry['title'];
-          $bookmark['hyperlink'] = $entry['bmkUri'];
-          $bookmark['description'] = $entry['description'];
-          // merge tags and keywords (what's the difference?)
-          $bookmark['tags'] = array_merge(count($entry['tags']) > 0 ? explode(' ', implode(' ', $entry['tags'])) : array(), ($entry['keyword'] == null ? array() : explode(' ', $entry['keyword'])));
-
-          $this->structure []= $bookmark;
-        }
-      }
-    }
   }
 
+
+
+
+
+  public function addBookmark($name, $hyperlink, $description, $tags) {
+    $bookmark = array();
+    $bookmark['name'] = $name;
+    $bookmark['hyperlink'] = $hyperlink;
+    $bookmark['description'] = $description;
+    $bookmark['tags'] = $tags;
+    $this->structure []= $bookmark;
+  }
 
 
 

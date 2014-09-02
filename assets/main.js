@@ -1,6 +1,6 @@
 var timeout = 3000;
 
-function update() {
+function updateBookmarks() {
   // display activity indicator
   document.getElementById("activity").style.display = "inline";
 
@@ -58,4 +58,22 @@ function activateBookmarksTab() {
 function activateFeedsTab() {
   document.getElementById("bookmarkstab").style.display = "none";
   document.getElementById("feedstab").style.display = "block";
+  //getFeeds();
+}
+
+
+function getFeeds() {
+  $.ajax({
+    type: "GET",
+    url: "index.php",
+    data: "action=getfeeds",
+    statusCode: {
+      200: function(response) {
+        updateListOfFeeds(response);
+      },
+      204: function() {
+        window.setTimeout("getFeeds()", timeout);
+      }
+    }
+  });
 }
