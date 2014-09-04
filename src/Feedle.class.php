@@ -43,22 +43,11 @@ class Feedle {
       else if ($parameters['action'] == 'refreshfeed') {
         try {
           // (re)load the contents of the provided feed (id)
-          if (!isset($parameters['feedid'])) {
-            header(':', true, 400);
-            throw new Exception('Error, no feed id provided');
-          }
-
-          $feedid = $parameters['feedid'];
-          if ($feedid == '') {
-            header(':', true, 400);
-            throw new Exception('Error, empty feed id provided');
-          }
 
           // this feed id is used for directory lookup and should not contain . or /
-          if (preg_replace('/[a-zA-Z0-9_-]+/', '', $feedid) != '') {
-            header(':', true, 400);
-            throw new Exception('Error, invalid feed id provided (strange characters in it)');
-          }
+          Feedle::parameterSanityCheck($parameters, 'feedid', '/[a-zA-Z0-9_-]+/');
+
+          $feedid = $parameters['feedid'];
 
           // we have a proper (but not necessarily existing) feed id
           // look up the feed uri (and perhaps credentials)
@@ -75,7 +64,7 @@ class Feedle {
             $simplePie->init();
             $items = array();
             foreach ($simplePie->get_items() as $item) {
-              $items []= array('id' => $item->get_id(), 'title' => $item->get_title(), 'link' => $item->get_permalink(), 'timestamp' => $item->get_date("U"));
+              $items []= array('title' => $item->get_title(), 'link' => $item->get_permalink(), 'timestamp' => $item->get_date("U"));
             }
 
             // save the items to file (unless they are)
@@ -84,10 +73,13 @@ class Feedle {
               $safeId = $item['timestamp'];
               $itemfilename = 'cache/feeds/' . $feedid . '/' . $safeId;
               if (!file_exists($itemfilename)) {
-                $itemContents = 'title = "' . $item['title'] . '"' . "\n" . 'uri = "' . $item['link'] . '"';
+                $itemContents = 'title = "' . addslashes($item['title']) . '"' . "\n" . 'uri = "' . $item['link'] . '"' . "\n" . 'timestampid = ' . $item['timestamp'];
                 file_put_contents($itemfilename, $itemContents);
               }
             }
+
+            // render the feed contents
+            echo FeedDataStructure::renderFeedContents($feedid);
           }
           else {
             header(':', true, 403);
@@ -98,11 +90,52 @@ class Feedle {
           echo '<li>' . $e->getMessage() . '</li>' . "\n";
         }
       }
+      else if ($parameters['action'] == 'movefeeditemtoarchive') {
+        try {
+          Feedle::parameterSanityCheck($parameters, 'feedid', '/[a-zA-Z0-9_-]+/');
+          Feedle::parameterSanityCheck($parameters, 'feeditemid', '/[0-9]+/');
+
+          $feedDirectory = 'cache/feeds/' . $parameters['feedid'];
+          $feedArchiveDirectory = $feedDirectory . '/archive';
+          if (!file_exists($feedArchiveDirectory))
+            mkdir($feedArchiveDirectory);
+
+          $filename = $parameters['feeditemid'];
+
+          rename($feedDirectory . '/' . $filename, $feedArchiveDirectory . '/' . $filename);
+        }
+        catch (Exception $e) {
+          header(':', true, 400);
+          throw new Exception('Error, feed item could not be archived.');
+        }
+      }
     }
     else {
       // just display the (possibly) cached bookmarks together with the whole page
       list($bookmarks, $feeds) = Feedle::readBookmarksFromCache();
       self::displayPage($bookmarks, $feeds);
+    }
+  }
+
+
+
+
+
+  private static function parameterSanityCheck($parameterArray, $parameterName, $parameterRegex) {
+    if (!isset($parameterArray[$parameterName])) {
+      header(':', true, 400);
+      throw new Exception('Error, no ' . $parameterName . ' provided');
+    }
+
+    $parameterValue = $parameterArray[$parameterName];
+    if ($parameterValue == '') {
+      header(':', true, 400);
+      throw new Exception('Error, empty ' . $parameterName . ' provided');
+    }
+
+    if (preg_replace($parameterRegex, '', $parameterValue) != '') {
+      header(':', true, 400);
+      throw new Exception('Error, invalid ' . $parameterName . ' provided (strange characters in it)');
     }
   }
 
@@ -224,7 +257,7 @@ EOT;
     </div>
     <div id="feedstab" style="xdisplay: none;">
       <h1>Feeds</h1>
-      <button id="feedupdatebutton" onclick="queryFeedsForNewItems()"><img src="assets/refresh.png"> all<!--Retrieve all feed items--></button><span style="display: none" id="activity"> <img src="assets/loader.gif" alt="activity indicator"/></span>
+      <button id="feedupdatebutton" onclick="alert('not yet implemented')//queryFeedsForNewItems()"><img src="assets/refresh.png"> all<!--Retrieve all feed items--></button><span style="display: none" id="activity"> <img src="assets/loader.gif" alt="activity indicator"/></span>
       <ul id="feedlist">
 
 EOT;

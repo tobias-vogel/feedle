@@ -62,6 +62,8 @@ function activateFeedsTab() {
 }
 
 function refreshFeed(feedid) {
+  $("#" + feedid + " div").html("Updating…");
+  //document.getElementById(feedid).innerHTML = "Updating…";
   $.ajax({
     type: "POST",
     url: "index.php",
@@ -81,5 +83,21 @@ function refreshFeed(feedid) {
 }
 
 function updateFeedContents(feedid, response) {
-  document.getElementById(feedid).innerHTML = response;
+  //document.getElementById(feedid).innerHTML = response;
+  $("#" + feedid + " div").html(response);
+}
+
+function archiveFeedItem(feedId, feedItemId) {
+  // ajax: move item to the archive
+   $.ajax({
+    type: "POST",
+    url: "index.php",
+    data: "action=movefeeditemtoarchive&feedid=" + feedId + "&feeditemid=" + feedItemId,
+    statusCode: {
+      200: function(response) {
+        // remove the feed item from the list
+        $("#" + feedId + "-" + feedItemId).remove();
+      }
+    }
+  });
 }
