@@ -18,6 +18,10 @@ class FeedDataStructure {
 
   public function renderHTML() {
     $result = '';
+    uasort ($this->structure, function($entry1, $entry2) {
+      return $entry1['name'] > $entry2['name'];
+    });
+
     foreach ($this->structure as $feed) {
       $result .= '<li id="' . $feed['id'] . '"' /*. onclick="refreshFeed(\'' . $feed['id'] . '\')"'*/ . '><button title="Request new feed items" onclick="refreshFeed(\'' . $feed['id'] . '\')"><img src="assets/refresh.png"></button> ' . $feed['name'] . ' (' . $feed['uri'] . ')' . "\n";
       $result .= '  <div>' . "\n";
