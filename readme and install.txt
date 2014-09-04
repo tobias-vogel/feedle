@@ -34,7 +34,7 @@ Now we start with the (not too) tough part.
 Feedle needs client functionality to connect to firefox sync. This functionality is provided by the github tool "fxa-sync-client" written by Edwin Wong (edmoz).
 This client bases on npm (node.js package manager) which in turn bases on node.js. In particular, at time of writing, it requires a version 0.10.x.
 In the /lib directory, there are two git submodules, node.js and the fxa-sync-client. (See http://git-scm.com/book/en/Git-Tools-Submodules)
-Both have to be checked out and built/installed.
+Both have to be checked out and built/installed. Further, simplepie is another submodule, used for feed crawling.
 We start with initializing these submodules. That actually downloads them, they are not cloned automatically.
 
 git submodule init

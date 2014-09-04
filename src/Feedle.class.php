@@ -40,26 +40,68 @@ class Feedle {
           header(':', true, 204);
         }
       }
-      else if ($parameters['action'] == 'getfeeds') {
-        // return the feeds from the cached file (or nothing, if there is no file)
-        if (file_exists('cache/.completed')) {
-          $bookmarks = Feedle::readBookmarksFromCache();
-          $feeds = $bookmarks->filterFeeds();
-          echo $feeds->renderHTML();
+      else if ($parameters['action'] == 'refreshfeed') {
+        try {
+          // (re)load the contents of the provided feed (id)
+          if (!isset($parameters['feedid'])) {
+            header(':', true, 400);
+            throw new Exception('Error, no feed id provided');
+          }
+
+          $feedid = $parameters['feedid'];
+          if ($feedid == '') {
+            header(':', true, 400);
+            throw new Exception('Error, empty feed id provided');
+          }
+
+          // this feed id is used for directory lookup and should not contain . or /
+          if (preg_replace('/[a-zA-Z0-9_-]+/', '', $feedid) != '') {
+            header(':', true, 400);
+            throw new Exception('Error, invalid feed id provided (strange characters in it)');
+          }
+
+          // we have a proper (but not necessarily existing) feed id
+          // look up the feed uri (and perhaps credentials)
+          $iniFile = 'cache/feeds/' . $feedid . '/meta.ini';
+          $data = parse_ini_file($iniFile);
+
+
+          // for non-empty credentials, another call must be made
+          if ($data['username'] == '' and $data['password'] == '') {
+            $feedBody = file_get_contents($data['uri']);
+            require_once('lib/simplepie/autoloader.php');
+            $simplePie = new SimplePie();
+            $simplePie->set_raw_data($feedBody);
+            $simplePie->init();
+            $items = array();
+            foreach ($simplePie->get_items() as $item) {
+              $items []= array('id' => $item->get_id(), 'title' => $item->get_title(), 'link' => $item->get_permalink(), 'timestamp' => $item->get_date("U"));
+            }
+
+            // save the items to file (unless they are)
+            foreach ($items as $item) {
+              #$safeId = preg_replace('/[^a-zA-Z0-9]/', "", $item['id']);
+              $safeId = $item['timestamp'];
+              $itemfilename = 'cache/feeds/' . $feedid . '/' . $safeId;
+              if (!file_exists($itemfilename)) {
+                $itemContents = 'title = "' . $item['title'] . '"' . "\n" . 'uri = "' . $item['link'] . '"';
+                file_put_contents($itemfilename, $itemContents);
+              }
+            }
+          }
+          else {
+            header(':', true, 403);
+            throw new Exception('Error, credentials required (enter them manually into the corresponding ini file)');
+          }
         }
-        else {
-          // tell the client that the file has not yet been fetched
-          // http_response_code(204); // does not work for PHP 5.3.3
-          header(':', true, 204);
+        catch (Exception $e) {
+          echo '<li>' . $e->getMessage() . '</li>' . "\n";
         }
       }
     }
     else {
       // just display the (possibly) cached bookmarks together with the whole page
       list($bookmarks, $feeds) = Feedle::readBookmarksFromCache();
-      //$feeds = $bookmarks->filterFeeds();
-//var_dump($feeds);
-//die();
       self::displayPage($bookmarks, $feeds);
     }
   }
@@ -72,6 +114,10 @@ class Feedle {
     // read the bookmarks from cache
     $json = null;
     $timestamp = null;
+
+    // create the feeds directory (or nothing is it exists)
+    if (!file_exists('cache/feeds'))
+      mkdir('cache/feeds');
 
     if (file_exists('cache/bookmarks.json') && file_exists('cache/.completed')) {
       $json = file_get_contents('cache/bookmarks.json');
@@ -105,7 +151,19 @@ class Feedle {
             $id = $entry['id'];
 
             // add this feed
-            $fds->addFeed($name, $feedUri, $id);
+            $fds->addFeed($id, $name, $feedUri);
+
+            // create a cache subdirectory for this feed (if it does not exist)
+            $feedDir = 'cache/feeds/' . $id;
+            if (!file_exists($feedDir))
+              mkdir($feedDir);
+
+            // create an ini file for this feed (if it does not yet exist)
+            $feedIniFilename = $feedDir . '/meta.ini';
+            if (!file_exists($feedIniFilename)) {
+              $feedIniContents = 'uri = "' . $feedUri . '"' . "\n" . 'username = ""' . "\n" . 'password = ""' . "\n";
+              file_put_contents($feedIniFilename, $feedIniContents);
+            }
           }
         }
       }
@@ -144,10 +202,10 @@ class Feedle {
   <body>
     <h1>Control</h1>
     <button id="updatebutton" onclick="updateBookmarks()">Retrieve updated sync data</button><span style="display: none" id="activity"> <img src="assets/loader.gif" alt="activity indicator"/></span>
-    <br>
+    <h1>View</h1>
     <span onclick="activateBookmarksTab()">Bookmarks</span>
     <span onclick="activateFeedsTab()">Feeds</span>
-    <div id="bookmarkstab">
+    <div id="bookmarkstab" style="display: none;">
       <h1>Bookmarks</h1>
 
 EOT;
@@ -159,13 +217,14 @@ EOT;
       <ul id="bookmarkslist">
 
 EOT;
-      echo $bookmarks->renderHTML();
+//      echo $bookmarks->renderHTML();
       echo <<<'EOT'
     
       </ul>
     </div>
     <div id="feedstab" style="xdisplay: none;">
       <h1>Feeds</h1>
+      <button id="feedupdatebutton" onclick="queryFeedsForNewItems()"><img src="assets/refresh.png"> all<!--Retrieve all feed items--></button><span style="display: none" id="activity"> <img src="assets/loader.gif" alt="activity indicator"/></span>
       <ul id="feedlist">
 
 EOT;
@@ -175,6 +234,7 @@ EOT;
     </div>
   </body>
 </html>
+
 EOT;
   }
 }

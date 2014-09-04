@@ -6,3 +6,6 @@
 	path = lib/node.js
 	url = https://github.com/joyent/node.git
         ignore = dirty
+[submodule "lib/simplepie"]
+	path = lib/simplepie
+	url = git://github.com/simplepie/simplepie.git

@@ -61,19 +61,25 @@ function activateFeedsTab() {
   //getFeeds();
 }
 
-
-function getFeeds() {
+function refreshFeed(feedid) {
   $.ajax({
-    type: "GET",
+    type: "POST",
     url: "index.php",
-    data: "action=getfeeds",
+    data: "action=refreshfeed&feedid=" + feedid,
     statusCode: {
       200: function(response) {
-        updateListOfFeeds(response);
+        updateFeedContents(feedid, response);
       },
-      204: function() {
-        window.setTimeout("getFeeds()", timeout);
+      400: function() {
+        updateFeedContents(feedid, response);
+      },
+      404: function() {
+        updateFeedContents(feedid, response);
       }
     }
   });
+}
+
+function updateFeedContents(feedid, response) {
+  document.getElementById(feedid).innerHTML = response;
 }
