@@ -55,7 +55,7 @@ class FeedDataStructure {
       foreach ($files as $file) {
         $data = parse_ini_file($feedContentDirectoryName . '/' . $file);
 #if (count($data) != 2) var_dump($data, $file);
-        $result .= '      <li id="' . $feedId . '-' . $data['timestampid'] . '"><button onclick="archiveFeedItem(\'' . $feedId . '\', \'' . $data['timestampid'] . '\')"><img src="assets/recycle.png"></button><a href="' . $data['uri'] . '">' . stripslashes($data['title']) . '</a></li>' . "\n";
+        $result .= '      <li id="' . $feedId . '-' . $data['timestampid'] . '"><button onclick="archiveFeedItem(\'' . $feedId . '\', \'' . $data['timestampid'] . '\')"><img src="assets/recycle.png"></button><a href="' . $data['uri'] . '">' . stripcslashes($data['title']) . '</a></li>' . "\n";
       }
       closedir($feedContentDirectory);
     }

@@ -74,7 +74,7 @@ class Feedle {
               $itemfilename = 'cache/feeds/' . $feedid . '/' . $safeId;
               $itemInArchiveFilename = 'cache/feeds/' . $feedid . '/archive/' . $safeId;
               if (!file_exists($itemfilename) and !file_exists($itemInArchiveFilename)) {
-                $itemContents = 'title = "' . addslashes($item['title']) . '"' . "\n" . 'uri = "' . $item['link'] . '"' . "\n" . 'timestampid = ' . $item['timestamp'];
+                $itemContents = 'title = "' . addcslashes($item['title'], "\\'\"\0\n") . '"' . "\n" . 'uri = "' . $item['link'] . '"' . "\n" . 'timestampid = ' . $item['timestamp'];
                 file_put_contents($itemfilename, $itemContents);
               }
             }
