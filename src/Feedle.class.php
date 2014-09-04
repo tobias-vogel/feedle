@@ -67,12 +67,13 @@ class Feedle {
               $items []= array('title' => $item->get_title(), 'link' => $item->get_permalink(), 'timestamp' => $item->get_date("U"));
             }
 
-            // save the items to file (unless they are)
+            // save the items to file (unless they are already in the archive)
             foreach ($items as $item) {
               #$safeId = preg_replace('/[^a-zA-Z0-9]/', "", $item['id']);
               $safeId = $item['timestamp'];
               $itemfilename = 'cache/feeds/' . $feedid . '/' . $safeId;
-              if (!file_exists($itemfilename)) {
+              $itemInArchiveFilename = 'cache/feeds/' . $feedid . '/archive/' . $safeId;
+              if (!file_exists($itemfilename) and !file_exists($itemInArchiveFilename)) {
                 $itemContents = 'title = "' . addslashes($item['title']) . '"' . "\n" . 'uri = "' . $item['link'] . '"' . "\n" . 'timestampid = ' . $item['timestamp'];
                 file_put_contents($itemfilename, $itemContents);
               }
@@ -238,7 +239,7 @@ class Feedle {
     <h1>View</h1>
     <span onclick="activateBookmarksTab()">Bookmarks</span>
     <span onclick="activateFeedsTab()">Feeds</span>
-    <div id="bookmarkstab" style="display: none;">
+    <div id="bookmarkstab" style="display: block;">
       <h1>Bookmarks</h1>
 
 EOT;
@@ -250,12 +251,12 @@ EOT;
       <ul id="bookmarkslist">
 
 EOT;
-//      echo $bookmarks->renderHTML();
+      echo $bookmarks->renderHTML();
       echo <<<'EOT'
     
       </ul>
     </div>
-    <div id="feedstab" style="xdisplay: none;">
+    <div id="feedstab" style="display: none;">
       <h1>Feeds</h1>
       <button id="feedupdatebutton" onclick="alert('not yet implemented')//queryFeedsForNewItems()"><img src="assets/refresh.png"> all<!--Retrieve all feed items--></button><span style="display: none" id="activity"> <img src="assets/loader.gif" alt="activity indicator"/></span>
       <ul id="feedlist">
