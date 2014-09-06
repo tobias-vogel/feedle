@@ -86,6 +86,9 @@ function refreshFeed(feedid, async = true) {
 function updateFeedContents(feedid, response) {
   //document.getElementById(feedid).innerHTML = response;
   $("#" + feedid + " div").html(response);
+
+  // make the feed visible (might have been hidden)
+  $("#" + feeedid).css("display", "list-item");
 }
 
 function archiveFeedItem(feedId, feedItemId) {
@@ -101,6 +104,12 @@ function archiveFeedItem(feedId, feedItemId) {
       }
     }
   });
+
+  // if it was the last feed item in this feed, hide the feed
+  if ($("#" + feedId + " div ul li").length == 0) {
+    // the feed is now empty
+    $("#" + feedId).css("display", "none");
+  }
 }
 
 function updateAllFeedContents() {
