@@ -61,13 +61,14 @@ function activateFeedsTab() {
   //getFeeds();
 }
 
-function refreshFeed(feedid) {
+function refreshFeed(feedid, async = true) {
   $("#" + feedid + " div").html("Updating…");
   //document.getElementById(feedid).innerHTML = "Updating…";
   $.ajax({
     type: "POST",
     url: "index.php",
     data: "action=refreshfeed&feedid=" + feedid,
+    async: async,
     statusCode: {
       200: function(response) {
         updateFeedContents(feedid, response);
@@ -99,5 +100,13 @@ function archiveFeedItem(feedId, feedItemId) {
         $("#" + feedId + "-" + feedItemId).remove();
       }
     }
+  });
+}
+
+function updateAllFeedContents() {
+  var feedIds = new Array();
+  $("#feedlist > li").each(function(index, feed) {
+    feedIds.push(feed.id);
+    refreshFeed(feed.id, false);
   });
 }

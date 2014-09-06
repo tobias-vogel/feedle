@@ -258,7 +258,7 @@ EOT;
     </div>
     <div id="feedstab" style="display: none;">
       <h1>Feeds</h1>
-      <button id="feedupdatebutton" onclick="alert('not yet implemented')//queryFeedsForNewItems()"><img src="assets/refresh.png"> all<!--Retrieve all feed items--></button><span style="display: none" id="activity"> <img src="assets/loader.gif" alt="activity indicator"/></span>
+      <button id="feedupdatebutton" onclick="updateAllFeedContents()"><img src="assets/refresh.png"> all<!--Retrieve all feed items--></button><span style="display: none" id="activity"> <img src="assets/loader.gif" alt="activity indicator"/></span>
       <ul id="feedlist">
 
 EOT;
