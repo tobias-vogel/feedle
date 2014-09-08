@@ -71,7 +71,7 @@ class FeedDataStructure {
     $feedContentDirectory = opendir($feedContentDirectoryName);
     $files = array();
     while ($file = readdir($feedContentDirectory)) {
-      if (in_array($file, array('meta.ini', '.', '..', 'archive')))
+      if (in_array($file, array('meta.ini', 'meta.ini~', '.', '..', 'archive')))
         continue;
       $files []= $file;
     }
