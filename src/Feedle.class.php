@@ -80,7 +80,8 @@ class Feedle {
             }
 
             // render the feed contents
-            echo FeedDataStructure::renderFeedContents($feedid);
+            $files = FeedDataStructure::getListOfFilesForFeed($feedid);
+            echo FeedDataStructure::renderFeedContents($files, $feedid);
           }
           else {
             header(':', true, 403);

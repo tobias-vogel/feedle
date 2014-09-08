@@ -65,7 +65,7 @@ class FeedDataStructure {
 
 
 
-  private static function getListOfFilesForFeed($feedId) {
+  public static function getListOfFilesForFeed($feedId) {
     $feedContentDirectoryName = 'cache/feeds/' . $feedId;
       // load the feed contents for this feed
     $feedContentDirectory = opendir($feedContentDirectoryName);
