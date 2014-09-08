@@ -58,7 +58,6 @@ function activateBookmarksTab() {
 function activateFeedsTab() {
   document.getElementById("bookmarkstab").style.display = "none";
   document.getElementById("feedstab").style.display = "block";
-  //getFeeds();
 }
 
 function refreshFeed(feedid, async = true) {
@@ -92,6 +91,7 @@ function updateFeedContents(feedid, response) {
 }
 
 function archiveFeedItem(feedId, feedItemId) {
+
   // ajax: move item to the archive
    $.ajax({
     type: "POST",
@@ -101,15 +101,18 @@ function archiveFeedItem(feedId, feedItemId) {
       200: function(response) {
         // remove the feed item from the list
         $("#" + feedId + "-" + feedItemId).remove();
+
+        // if it was the last feed item in this feed, hide the feed
+        var feedIsEmpty = $("#" + feedId + " div ul li").length == 0;
+        if (feedIsEmpty) {
+          // the feed is now empty
+          var feedElement = $("#" + feedId);
+          feedElement.css("display", "none");
+//          alert(feedElement.css("display"));
+        }
       }
     }
   });
-
-  // if it was the last feed item in this feed, hide the feed
-  if ($("#" + feedId + " div ul li").length == 0) {
-    // the feed is now empty
-    $("#" + feedId).css("display", "none");
-  }
 }
 
 function updateAllFeedContents() {

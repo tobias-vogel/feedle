@@ -23,10 +23,12 @@ class FeedDataStructure {
     });
 
     foreach ($this->structure as $feed) {
-      $result .= '<li id="' . $feed['id'] . '"' /*. onclick="refreshFeed(\'' . $feed['id'] . '\')"'*/ . '><button title="Request new feed items" onclick="refreshFeed(\'' . $feed['id'] . '\')"><img src="assets/refresh.png"></button> ' . $feed['name'] . ' (' . $feed['uri'] . ')' . "\n";
+      $files = FeedDataStructure::getListOfFilesForFeed($feed['id']);
+
+      $result .= '<li id="' . $feed['id'] . '"' . (empty($files) ? ' style="display: none;"' : '') . '><button title="Request new feed items" onclick="refreshFeed(\'' . $feed['id'] . '\')"' . '><img src="assets/refresh.png"></button> ' . $feed['name'] . ' (' . $feed['id'] . '; ' . $feed['uri'] . ')' . "\n";
       $result .= '  <div>' . "\n";
 
-      $result .= FeedDataStructure::renderFeedContents($feed['id']);
+      $result .= FeedDataStructure::renderFeedContents($files, $feed['id']);
 
       $result .= '  </div>' . "\n";
     }
@@ -38,36 +40,44 @@ class FeedDataStructure {
 
 
 
-  public static function renderFeedContents($feedId) {
+  public static function renderFeedContents($files, $feedId) {
+    $feedContentDirectoryName = 'cache/feeds/' . $feedId;
+
     $result = '';
     $result .= '    <ul>' . "\n";
 
-    $feedContentDirectoryName = 'cache/feeds/' . $feedId;// . '/unread';
-    if (file_exists($feedContentDirectoryName)) {
-      // load the feed contents for this feed
-      $feedContentDirectory = opendir($feedContentDirectoryName);
-      $files = array();
-      while ($file = readdir($feedContentDirectory)) {
-        if (in_array($file, array('meta.ini', '.', '..', 'archive')))
-          continue;
-        $files []= $file;
-      }
+    // sort the files
+    asort($files);
 
-      // sort the files
-      asort($files);
+    foreach ($files as $file) {
+      $data = parse_ini_file($feedContentDirectoryName . '/' . $file);
+      $result .= '      <li id="' . $feedId . '-' . $data['timestampid'] . '"><button onclick="archiveFeedItem(\'' . $feedId . '\', \'' . $data['timestampid'] . '\')"><img src="assets/recycle.png"></button><a href="' . $data['uri'] . '">' . stripcslashes($data['title']) . '</a></li>' . "\n";
+    }
 
-      foreach ($files as $file) {
-        $data = parse_ini_file($feedContentDirectoryName . '/' . $file);
-#if (count($data) != 2) var_dump($data, $file);
-        $result .= '      <li id="' . $feedId . '-' . $data['timestampid'] . '"><button onclick="archiveFeedItem(\'' . $feedId . '\', \'' . $data['timestampid'] . '\')"><img src="assets/recycle.png"></button><a href="' . $data['uri'] . '">' . stripcslashes($data['title']) . '</a></li>' . "\n";
-      }
-      closedir($feedContentDirectory);
-    }
-    else {
-      $result .= '      <li>Feed not (yet) loaded </li>' . "\n";
-    }
+/*  else {
+    $result .= '      <li>Feed not (yet) loaded </li>' . "\n";
+  }*/
     $result .= '    </ul>' . "\n";
     return $result;
+  }
+
+
+
+
+
+  private static function getListOfFilesForFeed($feedId) {
+    $feedContentDirectoryName = 'cache/feeds/' . $feedId;
+      // load the feed contents for this feed
+    $feedContentDirectory = opendir($feedContentDirectoryName);
+    $files = array();
+    while ($file = readdir($feedContentDirectory)) {
+      if (in_array($file, array('meta.ini', '.', '..', 'archive')))
+        continue;
+      $files []= $file;
+    }
+    closedir($feedContentDirectory);
+
+    return $files;
   }
 }
 ?>
