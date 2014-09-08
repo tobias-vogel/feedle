@@ -55,9 +55,17 @@ class Feedle {
           $data = parse_ini_file($iniFile);
 
 
-          // for non-empty credentials, another call must be made
-          if ($data['username'] == '' and $data['password'] == '') {
-            $feedBody = file_get_contents($data['uri']);
+          // use CURL to fetch the feed's contents (necessary, because file_get_contents and simplepie cannot handle HTTP authorization
+          $ch = curl_init();
+          curl_setopt($ch, CURLOPT_URL, $data['uri']);
+          curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+          // provide a (possibly empty, does not harm) password
+          curl_setopt($ch, CURLOPT_USERPWD, $data['username'] . ':' . $data['password']);
+          $feedBody = curl_exec($ch);
+          $inspectionResult = curl_getinfo($ch);
+          $httpCode = $inspectionResult['http_code'];
+          curl_close($ch);
+          if ($httpCode == 200) {
             require_once('lib/simplepie/autoloader.php');
             $simplePie = new SimplePie();
             $simplePie->set_raw_data($feedBody);
@@ -83,9 +91,13 @@ class Feedle {
             $files = FeedDataStructure::getListOfFilesForFeed($feedid);
             echo FeedDataStructure::renderFeedContents($files, $feedid);
           }
-          else {
+          else if ($httpCode == 401) {
             header(':', true, 403);
             throw new Exception('Error, credentials required (enter them manually into the corresponding ini file)');
+          }
+          else {
+            header(':', true, 403);
+            throw new Exception('Error, something went wrong with the request. (uri = ' . $data['uri'] .')');
           }
         }
         catch (Exception $e) {
