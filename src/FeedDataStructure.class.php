@@ -19,7 +19,7 @@ class FeedDataStructure {
   public function renderHTML() {
     $result = '';
     uasort ($this->structure, function($entry1, $entry2) {
-      return $entry1['name'] > $entry2['name'];
+      return strtolower($entry1['name']) > strtolower($entry2['name']);
     });
 
     foreach ($this->structure as $feed) {
