@@ -254,7 +254,7 @@ class Feedle {
     $result .= "    <a href=\"bookmarks.php\">Bookmarks</a> <a href=\"feeds.php\">Feeds</a>\n";
 //    $result .= "    <span onclick="activateBookmarksTab()">Bookmarks</span>\n";
 //    $result .= "    <span onclick="activateFeedsTab()">Feeds</span>\n";
-    $result .= "    <div id=\"bookmarkstab\" style=\"display: block;\">\n";
+    $result .= "    <div>\n";
     $result .= "      <h1>$title</h1>\n";
     $result .= $content;
     $result .= "    </div>\n";
@@ -291,8 +291,7 @@ class Feedle {
     $title = 'Feeds';
     $favicon = 'feed.ico';
     $content =
-      "<div id=\"feedstab\" style=\"display: block;\">\n" .
-      "<button id=\"feedupdatebutton\" onclick=\"updateAllFeedContents()\"><img src=\"assets/refresh.png\"> all<!--Retrieve all feed items--></button><span style=\"display: none\" id=\"activity\"> <img src=\"assets/loader.gif\" alt=\"activity indicator\"/></span>\n" .
+      "<button id=\"feedupdatebutton\" onclick=\"updateAllFeedContents()\"><img src=\"assets/refresh.png\"> all<!--Retrieve all feed items--></button><span style=\"display: none\" id=\"allfeedsactivity\"> <img src=\"assets/loader.gif\" alt=\"activity indicator\"/></span>\n" .
       "<ul id=\"feedlist\">\n" .
       $feeds->renderHTML() .
       "</ul>\n";
