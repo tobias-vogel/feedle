@@ -88,7 +88,7 @@ function updateFeedContents(feedid, response) {
   $("#" + feedid + " div").html(response);
 
   // make the feed visible (might have been hidden)
-  $("#" + feeedid).css("display", "list-item");
+  $("#" + feedid).css("display", "list-item");
 }
 
 function archiveFeedItem(feedId, feedItemId) {
