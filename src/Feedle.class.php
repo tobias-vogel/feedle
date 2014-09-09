@@ -124,11 +124,11 @@ class Feedle {
         }
       }
     }
-    else {
-      // just display the (possibly) cached bookmarks together with the whole page
-      list($bookmarks, $feeds) = Feedle::readBookmarksFromCache();
-      self::displayPage($bookmarks, $feeds);
-    }
+    //else {
+    //  // just display the (possibly) cached bookmarks together with the whole page
+    //  list($bookmarks, $feeds) = Feedle::readBookmarksFromCache();
+    //  self::displayPage($bookmarks, $feeds);
+    //}
   }
 
 
@@ -157,7 +157,7 @@ class Feedle {
 
 
 
-  private static function readBookmarksFromCache() {
+  public static function readBookmarksFromCache() {
     // read the bookmarks from cache
     $json = null;
     $timestamp = null;
@@ -232,57 +232,72 @@ class Feedle {
 
 
 
-  private function displayPage($bookmarks, $feeds) {
+  private static function displayPage($title, $favicon, $content) {
     // do it with echo, later a proper template engine may be more appropriate
-    echo <<<'EOT'
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Bookmarks</title>
-    <meta charset="utf-8">
-    <script src="assets/main.js" type="text/javascript"></script>
-    <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
-    <link href="assets/style.css" rel="stylesheet" type="text/css"/>
-    <link href="assets/favicon.ico" rel="icon" type="image/x-icon"/>
-    <meta name="viewport" content="width=device-width"/>
-  </head>
-  <body>
-    <h1>Control</h1>
-    <button id="updatebutton" onclick="updateBookmarks()">Retrieve updated sync data</button><span style="display: none" id="activity"> <img src="assets/loader.gif" alt="activity indicator"/></span>
-    <h1>View</h1>
-    <span onclick="activateBookmarksTab()">Bookmarks</span>
-    <span onclick="activateFeedsTab()">Feeds</span>
-    <div id="bookmarkstab" style="display: block;">
-      <h1>Bookmarks</h1>
 
-EOT;
-      echo 'Updated: ' . $bookmarks->getTimestamp();
-      echo <<<'EOT'
-      <br>
-      <input type="checkbox" id="openinnewtabtoggle" onclick="toggleOpenInNewTab();">
-      <label for="openinnewtabtoggle">Open links in new Tab</label>
-      <ul id="bookmarkslist">
+    $result = '';
+    $result .= "<!DOCTYPE html>\n";
+    $result .= "<html>\n";
+    $result .= "  <head>\n";
+    $result .= "    <title>$title</title>\n";
+    $result .= "    <meta charset=\"utf-8\">\n";
+    $result .= "    <script src=\"assets/main.js\" type=\"text/javascript\"></script>\n";
+    $result .= "    <script src=\"//code.jquery.com/jquery-2.1.1.min.js\"></script>\n";
+    $result .= "    <link href=\"assets/style.css\" rel=\"stylesheet\" type=\"text/css\"/>\n";
+    $result .= "    <link href=\"assets/$favicon\" rel=\"icon\" type=\"image/x-icon\/>\n";
+    $result .= "    <meta name=\"viewport\" content=\"width=device-width\"/>\n";
+    $result .= "  </head>\n";
+    $result .= "  <body>\n";
+    $result .= "    <h1>Control</h1>\n";
+    $result .= "    <button id=\"updatebutton\" onclick=\"updateBookmarks()\">Retrieve updated sync data</button><span style=\"display: none\" id=\"activity\"> <img src=\"assets/loader.gif\" alt=\"activity indicator\"/></span>\n";
+    $result .= "    <h1>View</h1>\n";
+    $result .= "    <a href=\"bookmarks.php\">Bookmarks</a> <a href=\"feeds.php\">Feeds</a>\n";
+//    $result .= "    <span onclick="activateBookmarksTab()">Bookmarks</span>\n";
+//    $result .= "    <span onclick="activateFeedsTab()">Feeds</span>\n";
+    $result .= "    <div id=\"bookmarkstab\" style=\"display: block;\">\n";
+    $result .= "      <h1>$title</h1>\n";
+    $result .= $content;
+    $result .= "    </div>\n";
+    $result .= "  </body>\n";
+    $result .= "</html>\n";
 
-EOT;
-      echo $bookmarks->renderHTML();
-      echo <<<'EOT'
-    
-      </ul>
-    </div>
-    <div id="feedstab" style="display: none;">
-      <h1>Feeds</h1>
-      <button id="feedupdatebutton" onclick="updateAllFeedContents()"><img src="assets/refresh.png"> all<!--Retrieve all feed items--></button><span style="display: none" id="activity"> <img src="assets/loader.gif" alt="activity indicator"/></span>
-      <ul id="feedlist">
+    return $result;
+  }
 
-EOT;
-      echo $feeds->renderHTML();
-      echo <<<'EOT'
-      </ul>
-    </div>
-  </body>
-</html>
 
-EOT;
+
+
+
+  public static function displayBookmarkPage($bookmarks) {
+    $title = 'Bookmarks';
+    $favicon = 'bookmark.ico';
+    $content =
+      "Updated: " . $bookmarks->getTimestamp() . "\n" .
+      "<br>\n" .
+      "<input type=\"checkbox\" id=\"openinnewtabtoggle\" onclick=\"toggleOpenInNewTab();\">\n" .
+      "<label for=\"openinnewtabtoggle\">Open links in new Tab</label>\n" .
+      "<ul id=\"bookmarkslist\">\n" .
+      $bookmarks->renderHTML() .
+      "</ul>\n";
+
+    return Feedle::displayPage($title, $favicon, $content);
+  }
+
+
+
+
+
+ public function displayFeedPage($feeds) {
+    $title = 'Feeds';
+    $favicon = 'feed.ico';
+    $content =
+      "<div id=\"feedstab\" style=\"display: block;\">\n" .
+      "<button id=\"feedupdatebutton\" onclick=\"updateAllFeedContents()\"><img src=\"assets/refresh.png\"> all<!--Retrieve all feed items--></button><span style=\"display: none\" id=\"activity\"> <img src=\"assets/loader.gif\" alt=\"activity indicator\"/></span>\n" .
+      "<ul id=\"feedlist\">\n" .
+      $feeds->renderHTML() .
+      "</ul>\n";
+
+    return Feedle::displayPage($title, $favicon, $content);
   }
 }
 ?>

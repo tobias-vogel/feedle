@@ -24,7 +24,7 @@ function updateBookmarks() {
 function getBookmarks() {
   $.ajax({
     type: "GET",
-    url: "index.php",
+    url: "endpoint.php",
     data: "action=getbookmarks",
     statusCode: {
       200: function(response) {
@@ -65,7 +65,7 @@ function refreshFeed(feedid, async = true) {
   //document.getElementById(feedid).innerHTML = "Updating…";
   $.ajax({
     type: "POST",
-    url: "index.php",
+    url: "endpoint.php",
     data: "action=refreshfeed&feedid=" + feedid,
     async: async,
     statusCode: {
@@ -95,7 +95,7 @@ function archiveFeedItem(feedId, feedItemId) {
   // ajax: move item to the archive
    $.ajax({
     type: "POST",
-    url: "index.php",
+    url: "endpoint.php",
     data: "action=movefeeditemtoarchive&feedid=" + feedId + "&feeditemid=" + feedItemId,
     statusCode: {
       200: function(response) {
