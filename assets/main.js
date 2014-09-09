@@ -110,7 +110,6 @@ function archiveFeedItem(feedId, feedItemId) {
           // the feed is now empty
           var feedElement = $("#" + feedId);
           feedElement.css("display", "none");
-//          alert(feedElement.css("display"));
         }
       }
     }
@@ -122,7 +121,7 @@ function updateAllFeedContents() {
   $("#allfeedsactivity").css("display", "inline");
 
   $("#feedlist > li").each(function(index, feed) {
-    refreshFeed(feed.id, true);
+    refreshFeed(feed.id, false);
   });
 
   // show all feed update indicator
