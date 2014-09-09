@@ -60,7 +60,8 @@ function activateFeedsTab() {
   document.getElementById("feedstab").style.display = "block";
 }
 
-function refreshFeed(feedid, async = true) {
+function refreshFeed(feedid, async) {
+  async = async || true;
   $("#" + feedid + " div").html("Updating…");
   //document.getElementById(feedid).innerHTML = "Updating…";
   $.ajax({
