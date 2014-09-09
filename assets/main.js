@@ -50,6 +50,7 @@ function toggleOpenInNewTab() {
   });
 }
 
+/*
 function activateBookmarksTab() {
   document.getElementById("bookmarkstab").style.display = "block";
   document.getElementById("feedstab").style.display = "none";
@@ -59,6 +60,7 @@ function activateFeedsTab() {
   document.getElementById("bookmarkstab").style.display = "none";
   document.getElementById("feedstab").style.display = "block";
 }
+*/
 
 function refreshFeed(feedid, async) {
   $("#" + feedid + " div").html("Updating…");
@@ -116,9 +118,13 @@ function archiveFeedItem(feedId, feedItemId) {
 }
 
 function updateAllFeedContents() {
-  var feedIds = new Array();
+  // show all feed update indicator
+  $("#allfeedsactivity").css("display", "inline");
+
   $("#feedlist > li").each(function(index, feed) {
-    feedIds.push(feed.id);
-    refreshFeed(feed.id, false);
+    refreshFeed(feed.id, true);
   });
+
+  // show all feed update indicator
+  $("#allfeedsactivity").css("display", "none");
 }
