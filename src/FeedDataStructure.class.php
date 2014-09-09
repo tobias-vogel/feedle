@@ -25,7 +25,7 @@ class FeedDataStructure {
     foreach ($this->structure as $feed) {
       $files = FeedDataStructure::getListOfFilesForFeed($feed['id']);
 
-      $result .= '<li id="' . $feed['id'] . '"' . (empty($files) ? ' style="display: none;"' : '') . '><button title="Request new feed items" onclick="refreshFeed(\'' . $feed['id'] . '\')"' . '><img src="assets/refresh.png"></button> ' . $feed['name'] . ' (' . $feed['id'] . '; ' . $feed['uri'] . ')' . "\n";
+      $result .= '<li id="' . $feed['id'] . '"' . (empty($files) ? ' style="display: none;"' : '') . '><button title="Request new feed items" onclick="refreshFeed(\'' . $feed['id'] . '\', true)"' . '><img src="assets/refresh.png"></button> ' . $feed['name'] . ' (' . $feed['id'] . '; ' . $feed['uri'] . ')' . "\n";
       $result .= '  <div>' . "\n";
 
       $result .= FeedDataStructure::renderFeedContents($files, $feed['id']);

@@ -61,7 +61,6 @@ function activateFeedsTab() {
 }
 
 function refreshFeed(feedid, async) {
-  async = async || true;
   $("#" + feedid + " div").html("Updating…");
   //document.getElementById(feedid).innerHTML = "Updating…";
   $.ajax({
