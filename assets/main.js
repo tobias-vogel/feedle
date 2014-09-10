@@ -104,7 +104,9 @@ function updateFeedContents(feedid, response, httpStatus) {
   // make the feed visible (might have been hidden)
   $("#" + feedid).css("display", "list-item");
 
-  if (httpStatus != 200)
+  if (httpStatus == 200)
+    $("#" + feedid + " div ul").removeAttr("class"); // in case there was an error, earlier, that should be removed now
+  else
     $("#" + feedid + " div ul").prop("class", "error");
 }
 
