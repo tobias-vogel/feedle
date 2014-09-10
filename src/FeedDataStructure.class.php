@@ -27,9 +27,9 @@ class FeedDataStructure {
 
       $result .= '<li id="' . $feed['id'] . '"' . (empty($files) ? ' style="display: none;"' : '') . '><button title="Request new feed items" onclick="refreshFeed(\'' . $feed['id'] . '\', true)"' . '><img src="assets/refresh.png"></button> ' . $feed['name'] . ' (' . $feed['id'] . '; ' . $feed['uri'] . ')' . "\n";
       $result .= '  <div>' . "\n";
-
+      $result .= '    <ul>' . "\n";
       $result .= FeedDataStructure::renderFeedContents($files, $feed['id']);
-
+      $result .= '    </ul>' . "\n";
       $result .= '  </div>' . "\n";
     }
     $result .= '</li>' . "\n";
@@ -44,7 +44,7 @@ class FeedDataStructure {
     $feedContentDirectoryName = 'cache/feeds/' . $feedId;
 
     $result = '';
-    $result .= '    <ul>' . "\n";
+//    $result .= '    <ul>' . "\n";
 
     // sort the files
     asort($files);
@@ -57,7 +57,7 @@ class FeedDataStructure {
 /*  else {
     $result .= '      <li>Feed not (yet) loaded </li>' . "\n";
   }*/
-    $result .= '    </ul>' . "\n";
+//    $result .= '    </ul>' . "\n";
     return $result;
   }
 

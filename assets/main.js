@@ -85,8 +85,11 @@ function refreshFeed(feedid, async) {
 }
 
 function updateFeedContents(feedid, response) {
+  if (response == "")
+    return;
+
   //document.getElementById(feedid).innerHTML = response;
-  $("#" + feedid + " div").html(response);
+  $("#" + feedid + " div ul").html(response);
 
   // make the feed visible (might have been hidden)
   $("#" + feedid).css("display", "list-item");
@@ -95,7 +98,7 @@ function updateFeedContents(feedid, response) {
 function archiveFeedItem(feedId, feedItemId) {
 
   // ajax: move item to the archive
-   $.ajax({
+  $.ajax({
     type: "POST",
     url: "endpoint.php",
     data: "action=movefeeditemtoarchive&feedid=" + feedId + "&feeditemid=" + feedItemId,
