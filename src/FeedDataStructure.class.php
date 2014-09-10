@@ -25,7 +25,7 @@ class FeedDataStructure {
     foreach ($this->structure as $feed) {
       $files = FeedDataStructure::getListOfFilesForFeed($feed['id']);
 
-      $result .= '<li id="' . $feed['id'] . '"' . (empty($files) ? ' style="display: none;"' : '') . '><button title="Request new feed items" onclick="refreshFeed(\'' . $feed['id'] . '\', true)"' . '><img src="assets/refresh.png"></button> ' . $feed['name'] . ' (' . $feed['id'] . '; ' . $feed['uri'] . ')' . "\n";
+      $result .= '<li id="' . $feed['id'] . '"' . (empty($files) ? ' style="display: none;"' : '') . '><button title="Request new feed items" onclick="refreshFeed(\'' . $feed['id'] . '\', true)"' . '><img src="assets/refresh.png" alt="activity indicator"></button> ' . $feed['name'] . ' (' . $feed['id'] . '; ' . $feed['uri'] . ')' . "\n";
       $result .= '  <div>' . "\n";
       $result .= '    <ul>' . "\n";
       $result .= FeedDataStructure::renderFeedContents($files, $feed['id']);
@@ -51,7 +51,7 @@ class FeedDataStructure {
 
     foreach ($files as $file) {
       $data = parse_ini_file($feedContentDirectoryName . '/' . $file);
-      $result .= '      <li id="' . $feedId . '-' . $data['timestampid'] . '"><button onclick="archiveFeedItem(\'' . $feedId . '\', \'' . $data['timestampid'] . '\')"><img src="assets/recycle.png"></button><a href="' . $data['uri'] . '">' . stripcslashes($data['title']) . '</a></li>' . "\n";
+      $result .= '      <li id="' . $feedId . '-' . $data['timestampid'] . '"><button onclick="archiveFeedItem(\'' . $feedId . '\', \'' . $data['timestampid'] . '\')"><img src="assets/recycle.png" alt="activity indicator"></button><a href="' . $data['uri'] . '">' . stripcslashes($data['title']) . '</a></li>' . "\n";
     }
 
 /*  else {

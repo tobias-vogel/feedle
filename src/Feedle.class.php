@@ -277,7 +277,7 @@ class Feedle {
     $result .= "    <script src=\"assets/main.js\" type=\"text/javascript\"></script>\n";
     $result .= "    <script src=\"//code.jquery.com/jquery-2.1.1.min.js\"></script>\n";
     $result .= "    <link href=\"assets/style.css\" rel=\"stylesheet\" type=\"text/css\"/>\n";
-    $result .= "    <link href=\"assets/$favicon\" rel=\"icon\" type=\"image/x-icon\/>\n";
+    $result .= "    <link href=\"assets/$favicon\" rel=\"icon\" type=\"image/x-icon\"/>\n";
     $result .= "    <meta name=\"viewport\" content=\"width=device-width\"/>\n";
     $result .= "  </head>\n";
     $result .= "  <body>\n";
@@ -324,7 +324,7 @@ class Feedle {
     $title = 'Feeds';
     $favicon = 'feed.ico';
     $content =
-      "<button id=\"feedupdatebutton\" onclick=\"updateAllFeedContents()\"><img src=\"assets/refresh.png\"> all<!--Retrieve all feed items--></button><span style=\"display: none\" id=\"allfeedsactivity\"> <img src=\"assets/loader.gif\" alt=\"activity indicator\"/></span>\n" .
+      "<button id=\"feedupdatebutton\" onclick=\"updateAllFeedContents()\"><img src=\"assets/refresh.png\" alt=\"activity indicator\"> all<!--Retrieve all feed items--></button><span style=\"display: none\" id=\"allfeedsactivity\"> <img src=\"assets/loader.gif\" alt=\"activity indicator\"/></span>\n" .
       "<ul id=\"feedlist\">\n" .
       $feeds->renderHTML() .
       "</ul>\n";
