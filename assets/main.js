@@ -13,7 +13,7 @@ function updateBookmarks() {
   // start ajax request
   $.ajax({
     type: "POST",
-    url: "index.php",
+    url: "endpoint.php",
     data: "action=retrievebookmarksfromsyncserver"
   });
 

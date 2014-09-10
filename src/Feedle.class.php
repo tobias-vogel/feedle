@@ -12,117 +12,16 @@ class Feedle {
     // what we have to do depends on the parameters
     if (isset($parameters['action'])) {
       if ($parameters['action'] == 'retrievebookmarksfromsyncserver') {
-        // if an update is currently running, do nothing
-        if (file_exists('cache/.inprogress'))
-          return;
-
-        try {
-          // load the credentials
-          self::$configuration = ConfigLoader::loadConfiguration();
-        }
-        catch (ConfigurationNotFoundException $cnfe) {
-          echo $cnfe->getMessage() . "<br>\n";
-          exit;
-        }
-
-        // call sync server to get an updated list of bookmarks
-        Feedle::readBookmarksFromWebAndSaveIt(self::$configuration);
+        Feedle::retrieveBookmarksFromSyncServer();
       }
       else if ($parameters['action'] == 'getbookmarks') {
-        // return the bookmarks from the cached file (or nothing, if there is no file)
-        if (file_exists('cache/.completed')) {
-          $bookmarks = Feedle::readBookmarksFromCache();
-          echo $bookmarks->renderHTML();
-        }
-        else {
-          // tell the client that the file has not yet been fetched
-          // http_response_code(204); // does not work for PHP 5.3.3
-          header(':', true, 204);
-        }
+        Feedle::getBookmarks();
       }
       else if ($parameters['action'] == 'refreshfeed') {
-        try {
-          // (re)load the contents of the provided feed (id)
-
-          // this feed id is used for directory lookup and should not contain . or /
-          Feedle::parameterSanityCheck($parameters, 'feedid', '/[a-zA-Z0-9_-]+/');
-
-          $feedid = $parameters['feedid'];
-
-          // we have a proper (but not necessarily existing) feed id
-          // look up the feed uri (and perhaps credentials)
-          $iniFile = 'cache/feeds/' . $feedid . '/meta.ini';
-          $data = parse_ini_file($iniFile);
-
-
-          // use CURL to fetch the feed's contents (necessary, because file_get_contents and simplepie cannot handle HTTP authorization
-          $ch = curl_init();
-          curl_setopt($ch, CURLOPT_URL, $data['uri']);
-          curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-          curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-          // provide a (possibly empty, does not harm) password
-          curl_setopt($ch, CURLOPT_USERPWD, $data['username'] . ':' . $data['password']);
-          $feedBody = curl_exec($ch);
-          $inspectionResult = curl_getinfo($ch);
-          $httpCode = $inspectionResult['http_code'];
-          curl_close($ch);
-          if ($httpCode == 200) {
-            require_once('lib/simplepie/autoloader.php');
-            $simplePie = new SimplePie();
-            $simplePie->set_raw_data($feedBody);
-            $simplePie->init();
-            $items = array();
-            foreach ($simplePie->get_items() as $item) {
-              $items []= array('title' => $item->get_title(), 'link' => $item->get_permalink(), 'timestamp' => $item->get_date("U"));
-            }
-
-            // save the items to file (unless they are already in the archive)
-            foreach ($items as $item) {
-              #$safeId = preg_replace('/[^a-zA-Z0-9]/', "", $item['id']);
-              $safeId = $item['timestamp'];
-              $itemfilename = 'cache/feeds/' . $feedid . '/' . $safeId;
-              $itemInArchiveFilename = 'cache/feeds/' . $feedid . '/archive/' . $safeId;
-              if (!file_exists($itemfilename) and !file_exists($itemInArchiveFilename)) {
-                $itemContents = 'title = "' . addcslashes($item['title'], "\\'\"\0\n") . '"' . "\n" . 'uri = "' . $item['link'] . '"' . "\n" . 'timestampid = ' . $item['timestamp'];
-                file_put_contents($itemfilename, $itemContents);
-              }
-            }
-
-            // render the feed contents
-            $files = FeedDataStructure::getListOfFilesForFeed($feedid);
-            echo FeedDataStructure::renderFeedContents($files, $feedid);
-          }
-          else if ($httpCode == 401) {
-            header(':', true, 403);
-            throw new Exception('Error, credentials required (enter them manually into the corresponding ini file)');
-          }
-          else {
-            header(':', true, 403);
-            throw new Exception('Error, something went wrong with the request. (uri = ' . $data['uri'] .')');
-          }
-        }
-        catch (Exception $e) {
-          echo '<li>' . $e->getMessage() . '</li>' . "\n";
-        }
+        Feedle::refreshFeed($parameters);
       }
       else if ($parameters['action'] == 'movefeeditemtoarchive') {
-        try {
-          Feedle::parameterSanityCheck($parameters, 'feedid', '/[a-zA-Z0-9_-]+/');
-          Feedle::parameterSanityCheck($parameters, 'feeditemid', '/[0-9]+/');
-
-          $feedDirectory = 'cache/feeds/' . $parameters['feedid'];
-          $feedArchiveDirectory = $feedDirectory . '/archive';
-          if (!file_exists($feedArchiveDirectory))
-            mkdir($feedArchiveDirectory);
-
-          $filename = $parameters['feeditemid'];
-
-          rename($feedDirectory . '/' . $filename, $feedArchiveDirectory . '/' . $filename);
-        }
-        catch (Exception $e) {
-          header(':', true, 400);
-          throw new Exception('Error, feed item could not be archived.');
-        }
+        Feedle::moveFeedItemToArchive($parameters);
       }
     }
     //else {
@@ -158,16 +57,38 @@ class Feedle {
 
 
 
+  private static function retrieveBookmarksFromSyncServer() {
+    // if an update is currently running, do nothing
+    if (file_exists('cache/bookmarks.json.lock'))
+      return;
+
+    try {
+      // load the credentials
+      self::$configuration = ConfigLoader::loadConfiguration();
+    }
+    catch (ConfigurationNotFoundException $cnfe) {
+      echo $cnfe->getMessage() . "<br>\n";
+      exit;
+    }
+
+    // call sync server to get an updated list of bookmarks
+    Feedle::readBookmarksFromWebAndSaveIt(self::$configuration);
+  }
+
+
+
+
+
   public static function readBookmarksFromCache() {
     // read the bookmarks from cache
     $json = null;
     $timestamp = null;
 
-    // create the feeds directory (or nothing is it exists)
+    // create the feeds directory (or nothing if it exists)
     if (!file_exists('cache/feeds'))
       mkdir('cache/feeds');
 
-    if (file_exists('cache/bookmarks.json') && file_exists('cache/.completed')) {
+    if (file_exists('cache/bookmarks.json') && !file_exists('cache/bookmarks.json.lock')) {
       $json = file_get_contents('cache/bookmarks.json');
       $timestamp = filemtime('cache/bookmarks.json');
     }
@@ -223,10 +144,121 @@ class Feedle {
 
 
 
+  private static function getBookmarks() {
+    // return the bookmarks from the cached file (or nothing, if there is no file)
+    if (file_exists('cache/bookmarks.json.lock')) {
+      // tell the client that the file has not yet been fetched
+      // http_response_code(204); // does not work for PHP 5.3.3
+      header(':', true, 204);
+    }
+    else {
+      list($bookmarks, $feeds) = Feedle::readBookmarksFromCache();
+      echo $bookmarks->renderHTML();
+    }
+  }
+
+
+
+
+
   private static function readBookmarksFromWebAndSaveIt($configuration) {
     // start a process that does query the sync server
-    $command = "rm cache/.completed; touch cache/.inprogress && lib/fxa-sync-client/bin/sync-cli.js -e " . $configuration['email'] . " -p " . $configuration['password'] . " -t bookmarks | sed -n -E -e '/::bookmarks::/,$ p' - | sed '1 d' > cache/bookmarks.json && touch cache/.completed && rm cache/.inprogress";
+//    $command = "rm cache/.completed; touch cache/.inprogress && lib/fxa-sync-client/bin/sync-cli.js -e " . $configuration['email'] . " -p " . $configuration['password'] . " -t bookmarks | sed -n -E -e '/::bookmarks::/,$ p' - | sed '1 d' > cache/bookmarks.json && touch cache/.completed && rm cache/.inprogress";
+    $command = "touch cache/bookmarks.json.lock && lib/fxa-sync-client/bin/sync-cli.js -e " . $configuration['email'] . " -p " . $configuration['password'] . " -t bookmarks | sed -n -E -e '/::bookmarks::/,$ p' - | sed '1 d' > cache/bookmarks.json && rm cache/bookmarks.json.lock";
     exec($command);
+  }
+
+
+
+
+  private static function refreshFeed($parameters) {
+    try {
+      // (re)load the contents of the provided feed (id)
+
+      // this feed id is used for directory lookup and should not contain . or /
+      Feedle::parameterSanityCheck($parameters, 'feedid', '/[a-zA-Z0-9_-]+/');
+
+      $feedid = $parameters['feedid'];
+
+      // we have a proper (but not necessarily existing) feed id
+      // look up the feed uri (and perhaps credentials)
+      $iniFile = 'cache/feeds/' . $feedid . '/meta.ini';
+      $data = parse_ini_file($iniFile);
+
+
+      // use CURL to fetch the feed's contents (necessary, because file_get_contents and simplepie cannot handle HTTP authorization
+      $ch = curl_init();
+      curl_setopt($ch, CURLOPT_URL, $data['uri']);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+      curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+      // provide a (possibly empty, does not harm) password
+      curl_setopt($ch, CURLOPT_USERPWD, $data['username'] . ':' . $data['password']);
+      $feedBody = curl_exec($ch);
+      $inspectionResult = curl_getinfo($ch);
+      $httpCode = $inspectionResult['http_code'];
+      curl_close($ch);
+      if ($httpCode == 200) {
+        require_once('lib/simplepie/autoloader.php');
+        $simplePie = new SimplePie();
+        $simplePie->set_raw_data($feedBody);
+        $simplePie->init();
+        $items = array();
+        foreach ($simplePie->get_items() as $item) {
+          $items []= array('title' => $item->get_title(), 'link' => $item->get_permalink(), 'timestamp' => $item->get_date("U"));
+        }
+
+        // save the items to file (unless they are already in the archive)
+        foreach ($items as $item) {
+          #$safeId = preg_replace('/[^a-zA-Z0-9]/', "", $item['id']);
+          $safeId = $item['timestamp'];
+          $itemfilename = 'cache/feeds/' . $feedid . '/' . $safeId;
+          $itemInArchiveFilename = 'cache/feeds/' . $feedid . '/archive/' . $safeId;
+          if (!file_exists($itemfilename) and !file_exists($itemInArchiveFilename)) {
+            $itemContents = 'title = "' . addcslashes($item['title'], "\\'\"\0\n") . '"' . "\n" . 'uri = "' . $item['link'] . '"' . "\n" . 'timestampid = ' . $item['timestamp'];
+            file_put_contents($itemfilename, $itemContents);
+          }
+        }
+
+        // render the feed contents
+        $files = FeedDataStructure::getListOfFilesForFeed($feedid);
+        echo FeedDataStructure::renderFeedContents($files, $feedid);
+      }
+      else if ($httpCode == 401) {
+        header(':', true, 403);
+        throw new Exception('Error, credentials required (enter them manually into the corresponding ini file)');
+      }
+      else {
+        header(':', true, 403);
+        throw new Exception('Error, something went wrong with the request. (uri = ' . $data['uri'] .')');
+      }
+    }
+    catch (Exception $e) {
+      echo '<li>' . $e->getMessage() . '</li>' . "\n";
+    }
+  }
+
+
+
+
+
+  private static function moveFeedItemToArchive($parameters) {
+    try {
+      Feedle::parameterSanityCheck($parameters, 'feedid', '/[a-zA-Z0-9_-]+/');
+      Feedle::parameterSanityCheck($parameters, 'feeditemid', '/[0-9]+/');
+
+      $feedDirectory = 'cache/feeds/' . $parameters['feedid'];
+      $feedArchiveDirectory = $feedDirectory . '/archive';
+      if (!file_exists($feedArchiveDirectory))
+        mkdir($feedArchiveDirectory);
+
+      $filename = $parameters['feeditemid'];
+
+      rename($feedDirectory . '/' . $filename, $feedArchiveDirectory . '/' . $filename);
+    }
+    catch (Exception $e) {
+      header(':', true, 400);
+      throw new Exception('Error, feed item could not be archived.');
+    }
   }
 
 

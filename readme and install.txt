@@ -63,7 +63,7 @@ If it does not work, install it in the following way (commented out, here):
 
 #curl https://npmjs.org/install.sh | sudo sh   # install npm, however for me, that was not necessary, it is already included
 
-However, this command did not work, download install.sh with the following command:
+However, also this command did not work, download install.sh with the following command:
 
 cd ..
 wget --no-check-certificate https://npmjs.org/install.sh
@@ -73,11 +73,11 @@ sudo ./install.sh
 You are now ready to install (i.e., configure) fxa-sync-client.
 
 cd ../fxa-sync-client
-sudo ../node.js/bin/npm install
+sudo ../node.js/bin/npm install #npm might (only) work without the path
 
 When the installation succeeded, try the following command from /lib/fxa-sync-client/bin using your firefox sync credentials (It should give you a longly output, ending with a lot of json containing your bookmarks.):
 
-sync-cli.js -e myemailaddress -p mypassword -t bookmarks
+bin/sync-cli.js -e myemailaddress -p mypassword -t bookmarks
 
 Put your sync credentials in a file called /config/credentials.ini:
 email = youremail
