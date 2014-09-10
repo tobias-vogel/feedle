@@ -191,6 +191,7 @@ class Feedle {
       curl_setopt($ch, CURLOPT_URL, $data['uri']);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
       curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+      curl_setopt($ch, CURLOPT_USERAGENT, 'something not on a blacklist');
       // provide a (possibly empty, does not harm) password
       curl_setopt($ch, CURLOPT_USERPWD, $data['username'] . ':' . $data['password']);
       $feedBody = curl_exec($ch);
