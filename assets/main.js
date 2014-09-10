@@ -8,7 +8,9 @@ function updateBookmarks() {
   $("#updatebutton").attr("disabled", "disabled");
 
   // clear list
-  document.getElementById("bookmarkslist").innerHTML = "";
+  var bookmarksList = document.getElementById("bookmarkslist");
+  if (bookmarksList != null)
+    bookmarksList.innerHTML = "";
 
   // start ajax request
   $.ajax({
@@ -38,7 +40,9 @@ function getBookmarks() {
 }
 
 function updateTableWithBookmarks(bookmarksHTML) {
-  document.getElementById("bookmarkslist").innerHTML = bookmarksHTML;
+  var bookmarksList = document.getElementById("bookmarkslist");
+  if (bookmarksList != null)
+    bookmarksList.innerHTML = bookmarksHTML;
   document.getElementById("activity").style.display = "none";
   $("#updatebutton").removeAttr("disabled");
 }
