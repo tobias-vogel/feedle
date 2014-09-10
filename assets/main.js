@@ -72,19 +72,25 @@ function refreshFeed(feedid, async) {
     async: async,
     statusCode: {
       200: function(response) {
-        updateFeedContents(feedid, response);
+        updateFeedContents(feedid, response, 200);
       },
-      400: function() {
-        updateFeedContents(feedid, response);
-      },
-      404: function() {
-        updateFeedContents(feedid, response);
-      }
+//      400: function(response) {
+//        updateFeedContents(feedid, response);
+//      },
+//      403: function() {
+//        updateFeedContents(feedid, response);
+//      },
+//      404: function(response) {
+//        updateFeedContents(feedid, response);
+//      }
+    },
+    error: function (xhr, type, info) {
+      updateFeedContents(feedid, xhr.responseText, xhr.status);
     }
   });
 }
 
-function updateFeedContents(feedid, response) {
+function updateFeedContents(feedid, response, httpStatus) {
   if (response == "")
     return;
 
@@ -93,6 +99,9 @@ function updateFeedContents(feedid, response) {
 
   // make the feed visible (might have been hidden)
   $("#" + feedid).css("display", "list-item");
+
+  if (httpStatus != 200)
+    $("#" + feedid + " div ul").prop("class", "error");
 }
 
 function archiveFeedItem(feedId, feedItemId) {
