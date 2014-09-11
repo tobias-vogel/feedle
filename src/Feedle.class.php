@@ -184,8 +184,6 @@ class Feedle {
       // look up the feed uri (and perhaps credentials)
       $iniFile = 'cache/feeds/' . $feedid . '/meta.ini';
       $data = parse_ini_file($iniFile);
-
-
       // use CURL to fetch the feed's contents (necessary, because file_get_contents and simplepie cannot handle HTTP authorization
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_URL, $data['uri']);
@@ -205,7 +203,10 @@ class Feedle {
         $simplePie->init();
         $items = array();
         foreach ($simplePie->get_items() as $item) {
-          $items []= array('title' => $item->get_title(), 'link' => $item->get_permalink(), 'timestamp' => $item->get_date("U"));
+          // if there is no timestamp, use the feed item's permalink to have something (hopefully) unique (which is then not sorted by time)
+          $timestamp = $item->get_date("U");
+          $timestamp = $timestamp == null ? md5($item->get_permalink()) : $timestamp;
+          $items []= array('title' => $item->get_title(), 'link' => $item->get_permalink(), 'timestamp' => $timestamp);
         }
 
         // save the items to file (unless they are already in the archive)
@@ -245,7 +246,7 @@ class Feedle {
   private static function moveFeedItemToArchive($parameters) {
     try {
       Feedle::parameterSanityCheck($parameters, 'feedid', '/[a-zA-Z0-9_-]+/');
-      Feedle::parameterSanityCheck($parameters, 'feeditemid', '/[0-9]+/');
+      Feedle::parameterSanityCheck($parameters, 'feeditemid', '/[0-9a-f]+/');
 
       $feedDirectory = 'cache/feeds/' . $parameters['feedid'];
       $feedArchiveDirectory = $feedDirectory . '/archive';
