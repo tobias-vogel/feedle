@@ -95,6 +95,9 @@ function refreshFeed(feedid, async) {
 }
 
 function updateFeedContents(feedid, response, httpStatus) {
+  // remove the "updating…"
+  $("#" + feedid + " div ul").html("");
+
   if (response == "")
     return;
 
@@ -111,7 +114,6 @@ function updateFeedContents(feedid, response, httpStatus) {
 }
 
 function archiveFeedItem(feedId, feedItemId) {
-
   // ajax: move item to the archive
   $.ajax({
     type: "POST",
