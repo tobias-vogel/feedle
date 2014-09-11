@@ -122,13 +122,7 @@ function archiveFeedItem(feedId, feedItemId) {
         // remove the feed item from the list
         $("#" + feedId + "-" + feedItemId).remove();
 
-        // if it was the last feed item in this feed, hide the feed
-        var feedIsEmpty = $("#" + feedId + " div ul li").length == 0;
-        if (feedIsEmpty) {
-          // the feed is now empty
-          var feedElement = $("#" + feedId);
-          feedElement.css("display", "none");
-        }
+        hideFeedIfPossible(feedId);
       }
     }
   });
@@ -144,4 +138,28 @@ function updateAllFeedContents() {
 
   // show all feed update indicator
   $("#allfeedsactivity").css("display", "none");
+}
+
+function toggleShowAllFeeds() {
+  var showAllFeeds = document.getElementById("showallfeedstoggle").checked;
+
+  $("#feedlist > li").each(function(index, feed) {
+    if (showAllFeeds) {
+      showFeed(feed.id, true);
+    }
+    else {
+      hideFeedIfPossible(feed.id);
+    }
+  });
+}
+
+function hideFeedIfPossible(feedId) {
+  if ($("#" + feedId + " div ul li").length == 0)
+    $("#" + feedId).css("display", "none");
+}
+
+function showFeed(feedId, forceShow) {
+  if (forceShow || ($("#" + feedId + " div ul li").length > 0)) {
+    $("#" + feedId).css("display", "list-item");
+  }
 }
