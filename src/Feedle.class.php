@@ -255,11 +255,20 @@ class Feedle {
 
       $filename = $parameters['feeditemid'];
 
-      rename($feedDirectory . '/' . $filename, $feedArchiveDirectory . '/' . $filename);
+      $sourceFilenameFull = $feedDirectory . '/' . $filename;
+      $targetFilenameFull = $feedArchiveDirectory . '/' . $filename;
+
+
+      if (!file_exists($sourceFilenameFull))
+        throw new Exception('Error, the feed item could not be found, maybe it was already archived?');
+
+      $success = rename($sourceFilenameFull, $targetFilenameFull);
+      if (!$success)
+        throw new Exception('Error, the feed item could not be archived for an unknown reason.');
     }
     catch (Exception $e) {
       header(':', true, 400);
-      throw new Exception('Error, feed item could not be archived.');
+      echo $e->getMessage();
     }
   }
 
@@ -278,11 +287,13 @@ class Feedle {
     $result .= "    <meta charset=\"utf-8\">\n";
     $result .= "    <script src=\"assets/main.js\" type=\"text/javascript\"></script>\n";
     $result .= "    <script src=\"//code.jquery.com/jquery-2.1.1.min.js\"></script>\n";
+    $result .= "    <script src=\"https://raw.github.com/gabrieleromanato/jQuery-MD5/master/jquery.md5.min.js\"></script>\n";
     $result .= "    <link href=\"assets/style.css\" rel=\"stylesheet\" type=\"text/css\"/>\n";
     $result .= "    <link href=\"assets/$favicon\" rel=\"icon\" type=\"image/x-icon\"/>\n";
     $result .= "    <meta name=\"viewport\" content=\"width=device-width\"/>\n";
     $result .= "  </head>\n";
     $result .= "  <body>\n";
+    $result .= "    <ul id=\"errorbar\"></ul>\n";
     $result .= "    <h1>Control</h1>\n";
     $result .= "    <button id=\"updatebutton\" onclick=\"updateBookmarks()\">Retrieve updated sync data</button><span style=\"display: none\" id=\"activity\"> <img src=\"assets/loader.gif\" alt=\"activity indicator\"/></span>\n";
     $result .= "    <h1>View</h1>\n";

@@ -114,18 +114,18 @@ function updateFeedContents(feedid, response, httpStatus) {
 }
 
 function archiveFeedItem(feedId, feedItemId) {
+  // remove the feed item from the list
+  $("#" + feedId + "-" + feedItemId).remove();
+  hideFeedIfPossible(feedId);
+
   // ajax: move item to the archive
   $.ajax({
     type: "POST",
     url: "endpoint.php",
     data: "action=movefeeditemtoarchive&feedid=" + feedId + "&feeditemid=" + feedItemId,
-    statusCode: {
-      200: function(response) {
-        // remove the feed item from the list
-        $("#" + feedId + "-" + feedItemId).remove();
-
-        hideFeedIfPossible(feedId);
-      }
+    error: function(xhr, textStatus, errorThrown) {
+      var errorMessage = xhr.responseText;//"Feed Item could not be removed (" + xhr + ", " + textStatus + ", " + errorThrown + ").";
+      addErrorToErrorBar(errorMessage, $.md5(errorMessage));
     }
   });
 }
@@ -164,4 +164,14 @@ function showFeed(feedId, forceShow) {
   if (forceShow || ($("#" + feedId + " div ul li").length > 0)) {
     $("#" + feedId).css("display", "list-item");
   }
+}
+
+function addErrorToErrorBar(errorMessage, errorMessageId) {
+
+  var closeSnippet = " <span class=\"errormessageclosebutton\" onclick=\"removeErrorMessage('" + errorMessageId + "')\">[x]</span>";
+  $("#errorbar").append("<li id=\"" + errorMessageId + "\">" + errorMessage + closeSnippet + "</li>");
+}
+
+function removeErrorMessage(id) {
+  $("#" + id).remove();
 }
