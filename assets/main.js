@@ -78,12 +78,12 @@ function refreshFeed(feedid, async) {
       200: function(response) {
         updateFeedContents(feedid, response, 200);
       },
-//      400: function(response) {
-//        updateFeedContents(feedid, response);
-//      },
-//      403: function() {
-//        updateFeedContents(feedid, response);
-//      },
+      400: function(response) {
+        updateFeedContents(feedid, response);
+      },
+      403: function(xhr, type, info) {
+        updateFeedContents(feedid, xhr.responseText, 403);
+      },
 //      404: function(response) {
 //        updateFeedContents(feedid, response);
 //      }
