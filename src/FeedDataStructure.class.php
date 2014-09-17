@@ -25,7 +25,8 @@ class FeedDataStructure {
     foreach ($this->structure as $feed) {
       $files = FeedDataStructure::getListOfFilesForFeed($feed['id']);
 
-      $result .= '<li id="' . $feed['id'] . '"' . (empty($files) ? ' style="display: none;"' : '') . '><button title="Request new feed items" onclick="refreshFeed(\'' . $feed['id'] . '\', true)"' . '><img src="assets/refresh.png" alt="activity indicator"></button> ' . $feed['name'] . ' (' . $feed['id'] . '; ' . $feed['uri'] . ')' . "\n";
+
+      $result .= '<li id="' . $feed['id'] . '"' . (empty($files) ? ' style="display: none;"' : '') . '><button title="Request new feed items" onclick="refreshFeed(\'' . $feed['id'] . '\', true)"' . '><img src="assets/refresh.png" alt="activity indicator"></button> ' . (file_exists('cache/feeds/' . $feed['id'] . '/favicon.ico') ? '<img width="16" src="cache/feeds/' . $feed['id'] . '/favicon.ico" alt="favicon for this feed"/>' : '') . ' ' . $feed['name'] . ' (' . $feed['id'] . '; ' . $feed['uri'] . ')' . "\n";
       $result .= '  <div>' . "\n";
       $result .= '    <ul>' . "\n";
       $result .= FeedDataStructure::renderFeedContents($files, $feed['id']);
@@ -71,7 +72,7 @@ class FeedDataStructure {
     $feedContentDirectory = opendir($feedContentDirectoryName);
     $files = array();
     while ($file = readdir($feedContentDirectory)) {
-      if (in_array($file, array('meta.ini', 'meta.ini~', '.', '..', 'archive')))
+      if (in_array($file, array('meta.ini', 'meta.ini~', '.', '..', 'archive', 'favicon.ico')))
         continue;
       $files []= $file;
     }

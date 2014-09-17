@@ -184,9 +184,48 @@ class Feedle {
       // look up the feed uri (and perhaps credentials)
       $iniFile = 'cache/feeds/' . $feedid . '/meta.ini';
       $data = parse_ini_file($iniFile);
-      // use CURL to fetch the feed's contents (necessary, because file_get_contents and simplepie cannot handle HTTP authorization
+
+      $uri = $data['uri'];
+
+      // try to fetch the favicon, perhaps
+      if (rand(1, 10) == 10) {
+        // get the base uri, the part from the beginning upto (including) the third slash which should be the base address
+        $thirdSlashIndex = strpos($uri, '/', 7);
+        $baseAddress = substr($uri, 0, $thirdSlashIndex);
+        $faviconUri = $baseAddress . '/' . 'favicon.ico';
+
+        // use curl to get the file (because it can check the content type image/* and that it is no error message)
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $faviconUri);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'something not on a blacklist');
+        curl_setopt($ch, CURLOPT_HEADER, 1); // get the header
+        curl_setopt($ch, CURLOPT_NOBODY, 1); // and *only* get the header
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // get the response as a string from curl_exec(), rather than echoing it
+        // provide a (possibly empty, does not harm) password
+        curl_setopt($ch, CURLOPT_USERPWD, $data['username'] . ':' . $data['password']);
+        curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $contentLength = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+        $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+        curl_close($ch);
+
+        if ($httpCode == 200 and $contentLength > 0 and substr($contentType, 0, 6) === 'image/') {
+          // everything looks good, download the file
+          $ch = curl_init();
+          curl_setopt($ch, CURLOPT_URL, $faviconUri);
+          curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+          $targetFile = fopen('cache/feeds/' . $feedid . '/favicon.ico', 'w');
+          curl_setopt($ch, CURLOPT_FILE, $targetFile);
+          curl_exec($ch);
+          fclose($targetFile);
+          curl_close($ch);
+        }
+      }
+
+      // use CURL to fetch the feed's contents (necessary, because file_get_contents and simplepie cannot handle HTTP authorization)
       $ch = curl_init();
-      curl_setopt($ch, CURLOPT_URL, $data['uri']);
+      curl_setopt($ch, CURLOPT_URL, $uri);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
       curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
       curl_setopt($ch, CURLOPT_USERAGENT, 'something not on a blacklist');
