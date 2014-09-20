@@ -222,12 +222,15 @@ class Feedle {
           }
         }
 
+
         // perhaps, update the feed's favicon
         if (rand(1, 10) == 10) {
-
           // get homepage from feed
-          $homepage = $simplePie->get_link();
-
+          // do not use simplepie for that, it's currently broken or at least there is now way to fetch the <link> of the <channel>
+          //$homepage = $simplePie->get_link();
+          preg_match('/<channel>.*?<link>.*?(?=<\/link>)/s', $feedBody, $match);
+          $match = $match[0];
+          $homepage = preg_replace('/<channel>.*?<link>/s', '', $match);
           Feedle::downloadFavicon($data, $feedid, $homepage);
         }
 
@@ -272,6 +275,7 @@ class Feedle {
       $thirdSlashIndex = strpos($uri, '/', 8);
       $baseAddress = substr($uri, 0, $thirdSlashIndex);
       $baseAddressFaviconUri = $baseAddress . '/favicon.ico';
+var_dump($baseAddressFaviconUri);
       if (Feedle::reallyDownloadFavicon($baseAddressFaviconUri, $username, $password, $targetFilename)) return;
     }
 
@@ -312,10 +316,15 @@ class Feedle {
           $htmlFaviconUri = $schema . $htmlFaviconUri;
         }
         else
-          // if the URI starts with "/", prepend it with the base address (from above)
-          if (substr($htmlFaviconUri, 0, 1) === '/') {
+          // if the URI does not start with "http", prepend it with the base address (from above)
+          if (substr($htmlFaviconUri, 0, 4) != 'http') {
             $thirdSlashIndex = strpos($homepage, '/', 8);
             $baseAddress = substr($homepage, 0, $thirdSlashIndex);
+
+            // if the URI does not start with "/", add the missing slash
+            if (substr($htmlFaviconUri, 0, 1) != '/')
+              $htmlFaviconUri = '/' . $htmlFaviconUri;
+
             $htmlFaviconUri = $baseAddress . $htmlFaviconUri;
           }
         // ... and query the server with that
@@ -346,7 +355,6 @@ class Feedle {
     $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
     curl_close($ch);
 
-    // TODO do not accept the file when it's a feedburner icon (md5 hash?)
     if ($httpCode != 200 or $contentLength == 0 or substr($contentType, 0, 6) != 'image/') {
       // this favicon did not exist or was somehow weird
       if (file_exists($targetFilename))
