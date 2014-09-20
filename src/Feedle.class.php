@@ -223,7 +223,7 @@ class Feedle {
         }
 
         // perhaps, update the feed's favicon
-        if (rand(1, 10) <= 10) {
+        if (rand(1, 10) == 10) {
 
           // get homepage from feed
           $homepage = $simplePie->get_link();
@@ -255,57 +255,97 @@ class Feedle {
 
   private static function downloadFavicon($data, $feedid, $homepage) {
     $uri = $data['uri'];
+    $username = $data['username'];
+    $password = $data['password'];
+    $targetFilename = 'cache/feeds/' . $feedid . '/favicon.ico';
 
-    // try to fetch the favicon
+    // there are several ways to get the (desired) favicon
+    // 1. feeduri favicon.ico (guess)
+    // 2. homepage favicon.ico (guess) 
+    // 3. homepage html head section (hard to find out)
+
     // get the base uri, the part from the beginning upto (including) the third slash which should be the base address
     $thirdSlashIndex = strpos($uri, '/', 8);
     $baseAddress = substr($uri, 0, $thirdSlashIndex);
-    // TODO also try to parse the icon uri from the main page's html
+    $baseAddressFaviconUri = $baseAddress . '/favicon.ico';
+    if (Feedle::reallyDownloadFavicon($baseAddressFaviconUri, $username, $password, $targetFilename)) return;
 
-    $candidateUris = array_unique(array($baseAddress, $homepage));
 
-//var_dump($candidateUris);
-//die();
+    // just try it with the homepage
+    $homepageFaviconUri = $homepage . '/favicon.ico';
+    if (Feedle::reallyDownloadFavicon($homepageFaviconUri, $username, $password, $targetFilename)) return;
 
-    foreach ($candidateUris as $candidateUri) {
-      $faviconUri = $candidateUri . '/' . 'favicon.ico';
-//var_dump($faviconUri);
 
-      // use curl to get the file (because it can check the content type image/* and that it is no error message)
-      $ch = curl_init();
-      curl_setopt($ch, CURLOPT_URL, $faviconUri);
-      curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-      curl_setopt($ch, CURLOPT_USERAGENT, 'something not on a blacklist');
-      //curl_setopt($ch, CURLOPT_HEADER, 1); // get the header
-      //curl_setopt($ch, CURLOPT_NOBODY, 1); // and *only* get the header
-      curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // get the response as a string from curl_exec(), rather than echoing it
-      // provide a (possibly empty, does not harm) password
-      curl_setopt($ch, CURLOPT_USERPWD, $data['username'] . ':' . $data['password']);
-      $targetFilename = 'cache/feeds/' . $feedid . '/favicon.ico';
-      $targetFile = fopen($targetFilename, 'w');
-      curl_setopt($ch, CURLOPT_FILE, $targetFile);
-      curl_exec($ch);
-      fclose($targetFile);
-      $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-      $contentLength = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
-      $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
-      curl_close($ch);
+    // try to parse the icon uri from the main page's html
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $homepage);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_USERAGENT, 'something not on a blacklist');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // get the response as a string from curl_exec(), rather than echoing it
+    // provide a (possibly empty, does not harm) password
+    curl_setopt($ch, CURLOPT_USERPWD, $username . ':' . $password);
+    $body = curl_exec($ch);
+    curl_close($ch);
 
-      // TODO do not accept the file when it's a feedburner icon (md5 hash?)
-//var_dump("fertig mit head, $httpCode, $contentLength, $contentType");
-//die();
-      if ($httpCode != 200 or $contentLength == 0 or substr($contentType, 0, 6) != 'image/') {
-        // this favicon did not exist or was somehow weird
-        if (file_exists($targetFilename))
-          // remove the favicon file (if a file was created at all)
-          unlink($targetFilename);
-        // try it again with the next candidate
-        continue;
+    // look for all the <link and then href="..." where rel="something with icon"
+    $parts = preg_split('/<link/', $body);
+    array_shift($parts);
+    foreach ($parts as $part) {
+      // get the value of the rel attribute
+      preg_match('/(?<=rel=([\'"])).*?(?=\1)/', $part, $match);
+      // only the first match is relevant
+      $match = $match[0];
+      // if the rel attribute value has icon in it...
+      if (preg_match('/icon/i', $match) === 1) {
+        // ...get the value of the href attribute...
+        preg_match('/(?<=href=([\'"])).*?(?=\1)/', $part, $match);
+        $htmlFaviconUri = $match[0];
+        // if the URI starts with "//", prepend it with the appropriate schema
+        if (substr($htmlFaviconUri, 0, 2) === '//') {
+          preg_match('/https?:/', $homepage, $schema);
+          $schema = $schema[0];
+          $htmlFaviconUri = $schema . $htmlFaviconUri;
+        }
+        // ... and query the server with that
+        if (Feedle::reallyDownloadFavicon($htmlFaviconUri, $username, $password, $targetFilename)) return;
       }
-      else {
-        // everything seems to be ok with the favicon, finish here
-        return;
-      }
+    }
+  }
+
+
+
+
+
+  private static function reallyDownloadFavicon($uri, $username, $password, $targetFilename) {
+    // use curl to get the file (because it can check the content type image/* and that it is no error message)
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $uri);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    curl_setopt($ch, CURLOPT_USERAGENT, 'something not on a blacklist');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); // get the response as a string from curl_exec(), rather than echoing it
+    // provide a (possibly empty, does not harm) password
+    curl_setopt($ch, CURLOPT_USERPWD, $username . ':' . $password);
+    $targetFile = fopen($targetFilename, 'w');
+    curl_setopt($ch, CURLOPT_FILE, $targetFile);
+    curl_exec($ch);
+    fclose($targetFile);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $contentLength = curl_getinfo($ch, CURLINFO_CONTENT_LENGTH_DOWNLOAD);
+    $contentType = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
+    curl_close($ch);
+
+    // TODO do not accept the file when it's a feedburner icon (md5 hash?)
+    if ($httpCode != 200 or $contentLength == 0 or substr($contentType, 0, 6) != 'image/') {
+      // this favicon did not exist or was somehow weird
+      if (file_exists($targetFilename))
+        // remove the favicon file (if a file was created at all)
+        unlink($targetFilename);
+      // try it again with the next candidate
+      return false;
+    }
+    else {
+      // everything seems to be ok with the favicon
+      return true;
     }
   }
 
