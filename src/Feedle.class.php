@@ -245,7 +245,7 @@ class Feedle {
       }
     }
     catch (Exception $e) {
-      echo '<li>' . $e->getMessage() . '</li>' . "\n";
+      echo $e->getMessage();
     }
   }
 

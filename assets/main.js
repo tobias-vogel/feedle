@@ -81,15 +81,17 @@ function refreshFeed(feedid, async) {
       400: function(response) {
         updateFeedContents(feedid, response);
       },
-      403: function(xhr, type, info) {
-        updateFeedContents(feedid, xhr.responseText, 403);
-      },
+//      403: function(xhr, type, info) {
+//        updateFeedContents(feedid, xhr.responseText, 403);
+//      },
 //      404: function(response) {
 //        updateFeedContents(feedid, response);
 //      }
     },
     error: function (xhr, type, info) {
-      updateFeedContents(feedid, xhr.responseText, xhr.status);
+//      updateFeedContents(feedid, xhr.responseText, xhr.status);
+      var errorMessage = xhr.responseText;
+      addErrorToErrorBar(errorMessage, $.md5(errorMessage));
     }
   });
 }
