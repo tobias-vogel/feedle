@@ -259,20 +259,25 @@ class Feedle {
     $password = $data['password'];
     $targetFilename = 'cache/feeds/' . $feedid . '/favicon.ico';
 
+    
+
     // there are several ways to get the (desired) favicon
     // 1. feeduri favicon.ico (guess)
     // 2. homepage favicon.ico (guess) 
     // 3. homepage html head section (hard to find out)
 
-    // get the base uri, the part from the beginning upto (including) the third slash which should be the base address
-    $thirdSlashIndex = strpos($uri, '/', 8);
-    $baseAddress = substr($uri, 0, $thirdSlashIndex);
-    $baseAddressFaviconUri = $baseAddress . '/favicon.ico';
-    if (Feedle::reallyDownloadFavicon($baseAddressFaviconUri, $username, $password, $targetFilename)) return;
+    // bypass the first step if the feed goes to feedburner
+    if (preg_match('/feed.+?\.feedburner.com/', $uri) === 0) {
+      // get the base uri, the part from the beginning upto (including) the third slash which should be the base address
+      $thirdSlashIndex = strpos($uri, '/', 8);
+      $baseAddress = substr($uri, 0, $thirdSlashIndex);
+      $baseAddressFaviconUri = $baseAddress . '/favicon.ico';
+      if (Feedle::reallyDownloadFavicon($baseAddressFaviconUri, $username, $password, $targetFilename)) return;
+    }
 
 
     // just try it with the homepage
-    $homepageFaviconUri = $homepage . '/favicon.ico';
+    $homepageFaviconUri = $homepage . (substr($homepage, strlen($homepage) - 1, 1) === '/' ? '' : '/') . 'favicon.ico';
     if (Feedle::reallyDownloadFavicon($homepageFaviconUri, $username, $password, $targetFilename)) return;
 
 
@@ -306,6 +311,13 @@ class Feedle {
           $schema = $schema[0];
           $htmlFaviconUri = $schema . $htmlFaviconUri;
         }
+        else
+          // if the URI starts with "/", prepend it with the base address (from above)
+          if (substr($htmlFaviconUri, 0, 1) === '/') {
+            $thirdSlashIndex = strpos($homepage, '/', 8);
+            $baseAddress = substr($homepage, 0, $thirdSlashIndex);
+            $htmlFaviconUri = $baseAddress . $htmlFaviconUri;
+          }
         // ... and query the server with that
         if (Feedle::reallyDownloadFavicon($htmlFaviconUri, $username, $password, $targetFilename)) return;
       }
