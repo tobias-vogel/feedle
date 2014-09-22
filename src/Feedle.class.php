@@ -275,7 +275,6 @@ class Feedle {
       $thirdSlashIndex = strpos($uri, '/', 8);
       $baseAddress = substr($uri, 0, $thirdSlashIndex);
       $baseAddressFaviconUri = $baseAddress . '/favicon.ico';
-var_dump($baseAddressFaviconUri);
       if (Feedle::reallyDownloadFavicon($baseAddressFaviconUri, $username, $password, $targetFilename)) return;
     }
 
