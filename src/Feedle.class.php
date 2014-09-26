@@ -408,7 +408,7 @@ class Feedle {
 
 
 
-  private static function displayPage($title, $favicon, $content) {
+  private static function displayPage($title, $favicon, $appleTouchIcon, $content) {
     // do it with echo, later a proper template engine may be more appropriate
 
     $result = '';
@@ -421,7 +421,8 @@ class Feedle {
     $result .= "    <script src=\"//code.jquery.com/jquery-2.1.1.min.js\"></script>\n";
     $result .= "    <script src=\"https://raw.github.com/gabrieleromanato/jQuery-MD5/master/jquery.md5.min.js\"></script>\n";
     $result .= "    <link href=\"assets/style.css\" rel=\"stylesheet\" type=\"text/css\"/>\n";
-    $result .= "    <link href=\"assets/$favicon\" rel=\"icon\" type=\"image/x-icon\"/>\n";
+    $result .= "    <link rel=\"icon\" href=\"assets/$favicon\" type=\"image/x-icon\"/>\n";
+    $result .= "    <link rel=\"apple-touch-icon\" href=\"assets/$appleTouchIcon\"/>\n";
     $result .= "    <meta name=\"viewport\" content=\"width=device-width\"/>\n";
     $result .= "  </head>\n";
     $result .= "  <body>\n";
@@ -449,6 +450,7 @@ class Feedle {
   public static function displayBookmarkPage($bookmarks) {
     $title = 'Bookmarks';
     $favicon = 'bookmark.ico';
+    $appleTouchIcon = 'bookmark.png';
     $content =
       "Updated: " . $bookmarks->getTimestamp() . "\n" .
       "<br>\n" .
@@ -458,7 +460,7 @@ class Feedle {
       $bookmarks->renderHTML() .
       "</ul>\n";
 
-    return Feedle::displayPage($title, $favicon, $content);
+    return Feedle::displayPage($title, $favicon, $appleTouchIcon, $content);
   }
 
 
@@ -468,6 +470,7 @@ class Feedle {
  public function displayFeedPage($feeds) {
     $title = 'Feeds';
     $favicon = 'feed.ico';
+    $appleTouchIcon = 'feed.png';
     $content =
       "<button id=\"feedupdatebutton\" onclick=\"updateAllFeedContents()\"><img src=\"assets/refresh.png\" alt=\"activity indicator\"> all<!--Retrieve all feed items--></button><span style=\"display: none\" id=\"allfeedsactivity\"> <img src=\"assets/loader.gif\" alt=\"activity indicator\"/></span>\n" .
       "<input type=\"checkbox\" id=\"showallfeedstoggle\" onclick=\"toggleShowAllFeeds();\"><label for=\"showallfeedstoggle\">Show all feeds</label>\n" .
@@ -475,7 +478,7 @@ class Feedle {
       $feeds->renderHTML() .
       "</ul>\n";
 
-    return Feedle::displayPage($title, $favicon, $content);
+    return Feedle::displayPage($title, $favicon, $appleTouchIcon, $content);
   }
 }
 ?>
