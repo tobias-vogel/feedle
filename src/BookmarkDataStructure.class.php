@@ -15,12 +15,13 @@ class BookmarkDataStructure {
 
 
 
-  public function addBookmark($name, $hyperlink, $description, $tags) {
+  public function addBookmark($name, $hyperlink, $description, $tags, $isFeed = false) {
     $bookmark = array();
     $bookmark['name'] = $name;
     $bookmark['hyperlink'] = $hyperlink;
     $bookmark['description'] = $description;
     $bookmark['tags'] = $tags;
+    $bookmark['isFeed'] = $isFeed;
     $this->structure []= $bookmark;
   }
 
@@ -33,7 +34,7 @@ class BookmarkDataStructure {
 
     foreach ($this->structure as $item) {
 
-      $result .= '<li>' . "\n";
+      $result .= '<li' . ($item['isFeed'] ? ' class="feed"' : '') . '>' . "\n";
       $result .= '  <div class="title">' .  $item['name'] . "</div>\n";
       $result .= '  <div class="hyperlink"><a href="' . $item['hyperlink'] . '">' . $item['hyperlink'] . "</a></div>\n";
       $result .= '  <ul class="tags">' . "\n";

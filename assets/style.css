@@ -43,3 +43,7 @@ ul.error {
   position: fixed;
   background-color: red;
 }
+
+li.feed div.title:before {
+  content: url(feed.ico);
+}

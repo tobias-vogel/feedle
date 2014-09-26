@@ -103,11 +103,11 @@ class Feedle {
         // only consider entries that actually are bookmarks or feeds
         if ($entry['type'] == 'bookmark' or $entry['type'] == 'livemark') {
           $name = $entry['title'];
+          $description = $entry['description'];
 
           if ($entry['type'] == 'bookmark') {
             // read all bookmark specific details
             $hyperlink = $entry['bmkUri'];
-            $description = $entry['description'];
             // merge tags and keywords (what's the difference?)
             $tags = array_merge(count($entry['tags']) > 0 ? explode(' ', implode(' ', $entry['tags'])) : array(), ($entry['keyword'] == null ? array() : explode(' ', $entry['keyword'])));
 
@@ -133,6 +133,9 @@ class Feedle {
               $feedIniContents = 'uri = "' . $feedUri . '"' . "\n" . 'username = ""' . "\n" . 'password = ""' . "\n";
               file_put_contents($feedIniFilename, $feedIniContents);
             }
+
+            // add this feed as a bookmark, too
+            $bds->addBookmark($name, $feedUri, $description, array(), true);
           }
         }
       }
