@@ -49,7 +49,8 @@ function updateTableWithBookmarks(bookmarksHTML) {
 
 function toggleOpenInNewTab() {
   var openInNewTab = document.getElementById("openinnewtabtoggle").checked;
-  $('ul#bookmarkslist li div.hyperlink a').each(function(index) {
+  //$('ul#bookmarkslist li div.hyperlink a').each(function(index) {
+  $('a.newtabbablehref').each(function(index) {
     this.target = (openInNewTab ? "_blank" : "_self");
   });
 }

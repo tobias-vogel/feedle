@@ -408,7 +408,7 @@ class Feedle {
 
 
 
-  private static function displayPage($title, $favicon, $appleTouchIcon, $content) {
+  private static function displayPage($title, $favicon, $appleTouchIcon, $content, $timestamp) {
     // do it with echo, later a proper template engine may be more appropriate
 
     $result = '';
@@ -428,11 +428,12 @@ class Feedle {
     $result .= "  <body>\n";
     $result .= "    <ul id=\"errorbar\"></ul>\n";
     $result .= "    <h1>Control</h1>\n";
-    $result .= "    <button id=\"updatebutton\" onclick=\"updateBookmarks()\">Retrieve updated sync data</button><span style=\"display: none\" id=\"activity\"> <img src=\"assets/loader.gif\" alt=\"activity indicator\"/></span>\n";
-    $result .= "    <h1>View</h1>\n";
-    $result .= "    <a href=\"bookmarks.php\">Bookmarks</a> <a href=\"feeds.php\">Feeds</a>\n";
+    $result .= "    <p><button id=\"updatebutton\" onclick=\"updateBookmarks()\">Retrieve updated sync data</button><span style=\"display: none\" id=\"activity\"> <img src=\"assets/loader.gif\" alt=\"activity indicator\"/></span></p>\n";
+    $result .= "    <p>Updated: " . $timestamp . "</p>\n";
+    $result .= "    <p><a href=\"bookmarks.php\">Bookmarks</a> <a href=\"feeds.php\">Feeds</a></p>\n";
 //    $result .= "    <span onclick="activateBookmarksTab()">Bookmarks</span>\n";
 //    $result .= "    <span onclick="activateFeedsTab()">Feeds</span>\n";
+    $result .= "    <p><input type=\"checkbox\" id=\"openinnewtabtoggle\" onclick=\"toggleOpenInNewTab();\"><label for=\"openinnewtabtoggle\">Open links in new Tab</label></p>\n";
     $result .= "    <div>\n";
     $result .= "      <h1>$title</h1>\n";
     $result .= $content;
@@ -452,22 +453,18 @@ class Feedle {
     $favicon = 'bookmark.ico';
     $appleTouchIcon = 'bookmark-128.png';
     $content =
-      "Updated: " . $bookmarks->getTimestamp() . "\n" .
-      "<br>\n" .
-      "<input type=\"checkbox\" id=\"openinnewtabtoggle\" onclick=\"toggleOpenInNewTab();\">\n" .
-      "<label for=\"openinnewtabtoggle\">Open links in new Tab</label>\n" .
       "<ul id=\"bookmarkslist\">\n" .
       $bookmarks->renderHTML() .
       "</ul>\n";
 
-    return Feedle::displayPage($title, $favicon, $appleTouchIcon, $content);
+    return Feedle::displayPage($title, $favicon, $appleTouchIcon, $content, $bookmarks->getTimestamp());
   }
 
 
 
 
 
- public function displayFeedPage($feeds) {
+ public function displayFeedPage($feeds, $timestamp) {
     $title = 'Feeds';
     $favicon = 'feed.ico';
     $appleTouchIcon = 'feed-128.png';
@@ -478,7 +475,7 @@ class Feedle {
       $feeds->renderHTML() .
       "</ul>\n";
 
-    return Feedle::displayPage($title, $favicon, $appleTouchIcon, $content);
+    return Feedle::displayPage($title, $favicon, $appleTouchIcon, $content, $timestamp);
   }
 }
 ?>

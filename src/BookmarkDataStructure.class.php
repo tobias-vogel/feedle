@@ -36,7 +36,7 @@ class BookmarkDataStructure {
 
       $result .= '<li' . ($item['isFeed'] ? ' class="feed"' : '') . '>' . "\n";
       $result .= '  <div class="title">' .  $item['name'] . "</div>\n";
-      $result .= '  <div class="hyperlink"><a href="' . $item['hyperlink'] . '">' . $item['hyperlink'] . "</a></div>\n";
+      $result .= '  <div class="hyperlink"><a href="' . $item['hyperlink'] . '"  class="newtabbablehref">' . $item['hyperlink'] . "</a></div>\n";
       $result .= '  <ul class="tags">' . "\n";
       if (count($item['tags']) > 0) {
         foreach ($item['tags'] as $tag) {
