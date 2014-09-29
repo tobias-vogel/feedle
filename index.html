@@ -14,9 +14,15 @@
       img {
         padding-left: 100px;
       }
+
+     /*
+     #feed:focus {
+       background-color: green;
+       cursor: crosshair;
+     }*/
     </style>
   </head>
-  <body style="text-align: center">
-    <a href="feeds.php"><img src="assets/feed.png" alt="feed icon" height="200"></a> <a href="bookmarks.php"><img src="assets/bookmark.png" alt="bookmark icon" height="200"></a>
+  <body style="text-align: center" onload="document.getElementById('feed').focus()">
+    <a href="feeds.php" id="feed"><img src="assets/feed.png" alt="feed icon" height="200"></a> <a href="bookmarks.php"><img src="assets/bookmark.png" alt="bookmark icon" height="200"></a>
   </body>
 </html>
