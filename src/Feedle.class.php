@@ -450,7 +450,7 @@ class Feedle {
   public static function displayBookmarkPage($bookmarks) {
     $title = 'Bookmarks';
     $favicon = 'bookmark.ico';
-    $appleTouchIcon = 'bookmark.png';
+    $appleTouchIcon = 'bookmark-128.png';
     $content =
       "Updated: " . $bookmarks->getTimestamp() . "\n" .
       "<br>\n" .
@@ -470,7 +470,7 @@ class Feedle {
  public function displayFeedPage($feeds) {
     $title = 'Feeds';
     $favicon = 'feed.ico';
-    $appleTouchIcon = 'feed.png';
+    $appleTouchIcon = 'feed-128.png';
     $content =
       "<button id=\"feedupdatebutton\" onclick=\"updateAllFeedContents()\"><img src=\"assets/refresh.png\" alt=\"activity indicator\"> all<!--Retrieve all feed items--></button><span style=\"display: none\" id=\"allfeedsactivity\"> <img src=\"assets/loader.gif\" alt=\"activity indicator\"/></span>\n" .
       "<input type=\"checkbox\" id=\"showallfeedstoggle\" onclick=\"toggleShowAllFeeds();\"><label for=\"showallfeedstoggle\">Show all feeds</label>\n" .
