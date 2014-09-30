@@ -469,8 +469,9 @@ class Feedle {
     $favicon = 'feed.ico';
     $appleTouchIcon = 'feed-128.png';
     $content =
-      "<button id=\"feedupdatebutton\" onclick=\"updateAllFeedContents()\"><img src=\"assets/refresh.png\" alt=\"activity indicator\"> all<!--Retrieve all feed items--></button><span style=\"display: none\" id=\"allfeedsactivity\"> <img src=\"assets/loader.gif\" alt=\"activity indicator\"/></span>\n" .
-      "<input type=\"checkbox\" id=\"showallfeedstoggle\" onclick=\"toggleShowAllFeeds();\"><label for=\"showallfeedstoggle\">Show all feeds</label>\n" .
+      "<p><button onclick=\"openRandomFeedItem()\"><img src=\"assets/random.png\" alt=\"Dies\" title=\"Open random feed item\" width=\"150\"/><br/>Open random feed item</button></p>\n" . 
+      "<p><button id=\"feedupdatebutton\" onclick=\"updateAllFeedContents()\"><img src=\"assets/refresh.png\" alt=\"activity indicator\"> all<!--Retrieve all feed items--></button><span style=\"display: none\" id=\"allfeedsactivity\"> <img src=\"assets/loader.gif\" alt=\"activity indicator\"/></span></p>\n" .
+      "<p><input type=\"checkbox\" id=\"showallfeedstoggle\" onclick=\"toggleShowAllFeeds();\"><label for=\"showallfeedstoggle\">Show all feeds</label></p>\n" .
       "<ul id=\"feedlist\">\n" .
       $feeds->renderHTML() .
       "</ul>\n";

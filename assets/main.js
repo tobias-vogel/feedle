@@ -178,3 +178,11 @@ function addErrorToErrorBar(errorMessage, errorMessageId) {
 function removeErrorMessage(id) {
   $("#" + id).remove();
 }
+
+function openRandomFeedItem() {
+  var feedItems = $("a.newtabbablehref");
+  var randomIndex = Math.floor(Math.random() * feedItems.length);
+  var feedItem = feedItems[randomIndex];
+  var href = feedItem.href;
+  window.open(href);
+}
