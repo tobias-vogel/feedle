@@ -52,7 +52,7 @@ class FeedDataStructure {
 
     foreach ($files as $file) {
       $data = parse_ini_file($feedContentDirectoryName . '/' . $file);
-      $result .= '      <li id="' . $feedId . '-' . $data['timestampid'] . '"><button onclick="archiveFeedItem(\'' . $feedId . '\', \'' . $data['timestampid'] . '\')"><img src="assets/recycle.png" alt="activity indicator"></button>' . (file_exists('cache/feeds/' . $feedId . '/favicon.ico') ? '<img width="16" src="cache/feeds/' . $feedId . '/favicon.ico" alt="favicon for this feed"/>' : '') . ' <a href="' . $data['uri'] . '" class="newtabbablehref">' . stripcslashes($data['title']) . '</a></li>' . "\n";
+      $result .= '      <li id="' . $feedId . '-' . $data['timestampid'] . '"><button onclick="archiveFeedItem(\'' . $feedId . '\', \'' . $data['timestampid'] . '\')"><img src="assets/recycle.png" alt="activity indicator"></button>' . (file_exists('cache/feeds/' . $feedId . '/favicon.ico') ? '<img width="16" src="cache/feeds/' . $feedId . '/favicon.ico" alt="favicon for this feed"/>' : '') . ' <a href="' . $data['uri'] . '" class="newtabbablehref" target="_blank">' . stripcslashes($data['title']) . '</a></li>' . "\n";
     }
 
 /*  else {

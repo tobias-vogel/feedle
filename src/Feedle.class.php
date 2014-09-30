@@ -433,7 +433,7 @@ class Feedle {
     $result .= "    <p><a href=\"bookmarks.php\">Bookmarks</a> <a href=\"feeds.php\">Feeds</a></p>\n";
 //    $result .= "    <span onclick="activateBookmarksTab()">Bookmarks</span>\n";
 //    $result .= "    <span onclick="activateFeedsTab()">Feeds</span>\n";
-    $result .= "    <p><input type=\"checkbox\" id=\"openinnewtabtoggle\" onclick=\"toggleOpenInNewTab();\"><label for=\"openinnewtabtoggle\">Open links in new Tab</label></p>\n";
+    $result .= "    <p><input type=\"checkbox\" id=\"openinnewtabtoggle\" onclick=\"toggleOpenInNewTab();\" checked=\"checked\"><label for=\"openinnewtabtoggle\">Open links in new Tab</label></p>\n";
     $result .= "    <div>\n";
     $result .= "      <h1>$title</h1>\n";
     $result .= $content;
