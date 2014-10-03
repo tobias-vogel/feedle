@@ -425,7 +425,7 @@ class Feedle {
     $result .= "    <link rel=\"apple-touch-icon\" href=\"assets/$appleTouchIcon\"/>\n";
     $result .= "    <meta name=\"viewport\" content=\"width=device-width\"/>\n";
     $result .= "  </head>\n";
-    $result .= "  <body>\n";
+    $result .= "  <body onlsoad=\"autoUpdateAllFeedsPacemaker()\">\n";
     $result .= "    <ul id=\"errorbar\"></ul>\n";
     $result .= "    <h1>Control</h1>\n";
     $result .= "    <p><button id=\"updatebutton\" onclick=\"updateBookmarks()\">Retrieve updated sync data</button><span style=\"display: none\" id=\"activity\"> <img src=\"assets/loader.gif\" alt=\"activity indicator\"/></span></p>\n";
@@ -471,6 +471,7 @@ class Feedle {
     $content =
       "<p><button onclick=\"openRandomFeedItem()\"><img src=\"assets/random.png\" alt=\"Dies\" title=\"Open random feed item\" width=\"150\"/><br/>Open random feed item</button></p>\n" . 
       "<p><button id=\"feedupdatebutton\" onclick=\"updateAllFeedContents()\"><img src=\"assets/refresh.png\" alt=\"activity indicator\"> all<!--Retrieve all feed items--></button><span style=\"display: none\" id=\"allfeedsactivity\"> <img src=\"assets/loader.gif\" alt=\"activity indicator\"/></span></p>\n" .
+      "<p><input type=\"checkbox\" id=\"autoupdatefeedstoggle\" onclick=\"toggleAutoUpdateFeeds();\"><label for=\"autoupdatefeedstoggle\">Auto-update feed items randomly (when not in focus)</label></p>\n" .
       "<p><input type=\"checkbox\" id=\"showallfeedstoggle\" onclick=\"toggleShowAllFeeds();\"><label for=\"showallfeedstoggle\">Show all feeds</label></p>\n" .
       "<ul id=\"feedlist\">\n" .
       $feeds->renderHTML() .

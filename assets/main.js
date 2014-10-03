@@ -1,5 +1,9 @@
 var timeout = 3000;
 
+var windowHasFocus = true;
+
+var autoUpdateAllFeeds = false;
+
 function updateBookmarks() {
   // display activity indicator
   document.getElementById("activity").style.display = "inline";
@@ -49,27 +53,23 @@ function updateTableWithBookmarks(bookmarksHTML) {
 
 function toggleOpenInNewTab() {
   var openInNewTab = document.getElementById("openinnewtabtoggle").checked;
-  //$('ul#bookmarkslist li div.hyperlink a').each(function(index) {
   $('a.newtabbablehref').each(function(index) {
     this.target = (openInNewTab ? "_blank" : "_self");
   });
 }
 
-/*
-function activateBookmarksTab() {
-  document.getElementById("bookmarkstab").style.display = "block";
-  document.getElementById("feedstab").style.display = "none";
+function toggleAutoUpdateFeeds() {
+  autoUpdateAllFeeds = document.getElementById("autoupdatefeedstoggle").checked;
 }
 
-function activateFeedsTab() {
-  document.getElementById("bookmarkstab").style.display = "none";
-  document.getElementById("feedstab").style.display = "block";
-}
-*/
+function refreshFeed(feedid, async, displayUpdatedDataOnlyWhenWindowInactive) {
+  if (displayUpdatedDataOnlyWhenWindowInactive) {
+    // do not display an updating message, because this is a hidden action
+  }
+  else {
+    $("#" + feedid + " div ul").html("Updating…");
+  }
 
-function refreshFeed(feedid, async) {
-  $("#" + feedid + " div ul").html("Updating…");
-  //document.getElementById(feedid).innerHTML = "Updating…";
   $.ajax({
     type: "POST",
     url: "endpoint.php",
@@ -77,10 +77,20 @@ function refreshFeed(feedid, async) {
     async: async,
     statusCode: {
       200: function(response) {
-        updateFeedContents(feedid, response, 200);
+        if (displayUpdatedDataOnlyWhenWindowInactive && windowHasFocus) {
+          // discard the update for not interfering with the user
+        }
+        else {
+          updateFeedContents(feedid, response, 200);
+        }
       },
       400: function(response) {
-        updateFeedContents(feedid, response);
+        if (displayUpdatedDataOnlyWhenWindowInactive && windowHasFocus) {
+          // discard the update for not interfering with the user
+        }
+        else {
+          updateFeedContents(feedid, response);
+        }
       },
 //      403: function(xhr, type, info) {
 //        updateFeedContents(feedid, xhr.responseText, 403);
@@ -138,7 +148,7 @@ function updateAllFeedContents() {
   $("#allfeedsactivity").css("display", "inline");
 
   $("#feedlist > li").each(function(index, feed) {
-    refreshFeed(feed.id, false);
+    refreshFeed(feed.id, false, false);
   });
 
   // show all feed update indicator
@@ -170,7 +180,6 @@ function showFeed(feedId, forceShow) {
 }
 
 function addErrorToErrorBar(errorMessage, errorMessageId) {
-
   var closeSnippet = " <span class=\"errormessageclosebutton\" onclick=\"removeErrorMessage('" + errorMessageId + "')\">[x]</span>";
   $("#errorbar").append("<li id=\"" + errorMessageId + "\">" + errorMessage + closeSnippet + "</li>");
 }
@@ -181,8 +190,53 @@ function removeErrorMessage(id) {
 
 function openRandomFeedItem() {
   var feedItems = $("a.newtabbablehref");
-  var randomIndex = Math.floor(Math.random() * feedItems.length);
+  var randomIndex = pickRandomNumber(feedItems.length);
   var feedItem = feedItems[randomIndex];
   var href = feedItem.href;
   window.open(href);
+}
+
+
+window.onblur = function() {
+  windowHasFocus = false;
+}
+
+window.onmouseout = function() {
+  windowHasFocus = false;
+}
+
+window.onfocus = function() {
+  windowHasFocus = true;
+}
+
+window.onmouseover = function() {
+  windowHasFocus = true;
+//  addErrorToErrorBar('onmouseover hat gefeuert', 'dasdasfasfas');
+//  $("h1")[0].style.background = "green";
+}
+
+function pickRandomNumber(largestValue) {
+  var randomNumber = Math.floor(Math.random() * largestValue);
+  return randomNumber;
+}
+
+function autoUpdateAllFeedsPacemaker() {
+  // only do something, if the auto update flag is set
+  if (autoUpdateAllFeeds) {
+    // pick a feed
+    var feeds = $("#feedlist > li");
+    var index = pickRandomNumber(feeds.length);
+    var feed = feeds[index];
+    var feedid = feed.id;
+
+    // issue a feed update (but with careful result printing)
+    refreshFeed(feedid, true, true);
+  }
+
+  // call this method over and over again (but it does nothing, if the flag is not set)
+  window.setTimeout(function() {autoUpdateAllFeedsPacemaker();}, 60 * 1000);
+}
+
+window.onload = function() {
+  autoUpdateAllFeedsPacemaker();
 }
