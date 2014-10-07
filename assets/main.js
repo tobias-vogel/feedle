@@ -4,6 +4,8 @@ var windowHasFocus = true;
 
 var autoUpdateAllFeeds = false;
 
+var lastRandomlySelectedFeedItemId = null;
+
 function updateBookmarks() {
   // display activity indicator
   document.getElementById("activity").style.display = "inline";
@@ -192,10 +194,20 @@ function openRandomFeedItem() {
   var feedItems = $("a.newtabbablehref");
   var randomIndex = pickRandomNumber(feedItems.length);
   var feedItem = feedItems[randomIndex];
+  lastRandomlySelectedFeedItemId = feedItem.parentNode.id;
   var href = feedItem.href;
   window.open(href);
 }
 
+function openRandomFeedItemAndRemovePreviousRandomFeedItem() {
+  if (lastRandomlySelectedFeedItemId != null) {
+    var temp = lastRandomlySelectedFeedItemId.split("-");
+    var feedId = temp[0];
+    var feedItemId = temp[1];
+    archiveFeedItem(feedId, feedItemId);
+  }
+  openRandomFeedItem();
+}
 
 window.onblur = function() {
   windowHasFocus = false;
