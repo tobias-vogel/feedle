@@ -475,8 +475,8 @@ class Feedle {
       "<p><input type=\"checkbox\" id=\"showallfeedstoggle\" onclick=\"toggleShowAllFeeds();\"><label for=\"showallfeedstoggle\">Show all feeds</label></p>\n" .
       "<ul id=\"feedlist\">\n" .
       $feeds->renderHTML() .
-      "</ul>\n";
-
+      "</ul>\n" .
+      "<input id=\"errortester\" value=\"Some error message\"/><button onclick=\"addErrorToErrorBar($('#errortester').val(), $.md5($('#errortester').val()))\">Test this error message</button>";
     return Feedle::displayPage($title, $favicon, $appleTouchIcon, $content, $timestamp);
   }
 }
