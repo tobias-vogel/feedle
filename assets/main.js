@@ -139,7 +139,12 @@ function archiveFeedItem(feedId, feedItemId) {
     url: "endpoint.php",
     data: "action=movefeeditemtoarchive&feedid=" + feedId + "&feeditemid=" + feedItemId,
     error: function(xhr, textStatus, errorThrown) {
-      var errorMessage = xhr.responseText;//"Feed Item could not be removed (" + xhr + ", " + textStatus + ", " + errorThrown + ").";
+      var responseStatus = xhr.status;
+      var errorMessage = "";
+      if (responseStatus == 0)
+        errorMessage = "The server could not be reached.";
+      else
+        errorMessage = xhr.responseText;//"Feed Item could not be removed (" + xhr + ", " + textStatus + ", " + errorThrown + ").";
       addErrorToErrorBar(errorMessage, $.md5(errorMessage));
     }
   });
@@ -182,6 +187,10 @@ function showFeed(feedId, forceShow) {
 }
 
 function addErrorToErrorBar(errorMessage, errorMessageId) {
+  if (typeof errorMessage === "undefined") {
+    errorMessage = "undefined error message!";
+    errorMessageId = $.md5(errorMessage);
+  }
   var closeSnippet = " <span class=\"errormessageclosebutton\" onclick=\"removeErrorMessage('" + errorMessageId + "')\">[x]</span>";
   $("#errorbar").append("<li id=\"" + errorMessageId + "\">" + errorMessage + closeSnippet + "</li>");
 }
