@@ -23,6 +23,9 @@ class Feedle {
       else if ($parameters['action'] == 'movefeeditemtoarchive') {
         Feedle::moveFeedItemToArchive($parameters);
       }
+      else if ($parameters['action'] == 'storeanote') {
+        Feedle::storeANote($parameters);
+      }
     }
     //else {
     //  // just display the (possibly) cached bookmarks together with the whole page
@@ -140,6 +143,23 @@ class Feedle {
         }
       }
     }
+    
+    // read bookmarksnotes from disk
+    $bookmarksnotesDirectoryName = 'cache/bookmarksnotes';
+    $bookmarksnotesDirectory = opendir($bookmarksnotesDirectoryName);
+    $notes = array();
+    while ($file = readdir($bookmarksnotesDirectory)) {
+      if (in_array($file, array('.', '..')))
+        continue;
+
+      $note = file_get_contents($bookmarksnotesDirectoryName . '/' . $file);
+      // replace newlines by <br>
+      $note = str_replace("\n", '<br>', $note);
+      $notes []= $note;
+    }
+    closedir($bookmarksnotesDirectory);
+    $bds->addNotes($notes);
+    
     return array($bds, $fds);
   }
 
@@ -408,6 +428,25 @@ class Feedle {
 
 
 
+  private static function storeANote($parameters) {
+    $noteToStore = $parameters['notetostore'];
+    // save the note with a current timestamp
+    $bookmarksnotesDir = 'cache/bookmarksnotes';
+    if (!file_exists($bookmarksnotesDir))
+      mkdir($bookmarksnotesDir);
+    
+    $timestamp = round(microtime(true) * 1000);
+    $fileToSave = $bookmarksnotesDir . "/" . $timestamp;
+    file_put_contents($fileToSave, $noteToStore);
+
+    // http redirect to the bookmarks page
+    header('Location: ' . $_SERVER['HTTP_REFERER']);
+  }
+
+
+
+
+
   private static function displayPage($title, $favicon, $appleTouchIcon, $content, $timestamp) {
     // do it with echo, later a proper template engine may be more appropriate
 
@@ -453,6 +492,7 @@ class Feedle {
     $favicon = 'bookmark.ico';
     $appleTouchIcon = 'bookmark-128.png';
     $content =
+      "<form method=\"post\" action=\"endpoint.php\"><input type=\"hidden\" name=\"action\" value=\"storeanote\"/>Store a note (for a bookmark)<br/><textarea name=\"notetostore\"></textarea><br/><input type=\"submit\" value=\"Store this note\"/></form>" .
       "<ul id=\"bookmarkslist\">\n" .
       $bookmarks->renderHTML() .
       "</ul>\n";
@@ -464,7 +504,7 @@ class Feedle {
 
 
 
- public function displayFeedPage($feeds, $timestamp) {
+  public function displayFeedPage($feeds, $timestamp) {
     $title = 'Feeds';
     $favicon = 'feed.ico';
     $appleTouchIcon = 'feed-128.png';

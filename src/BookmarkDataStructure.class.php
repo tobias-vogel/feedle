@@ -2,6 +2,7 @@
 class BookmarkDataStructure {
   private $structure = array();
   private $timestamp;
+  private $notes;
 
 
 
@@ -29,8 +30,20 @@ class BookmarkDataStructure {
 
 
 
+  public function addNotes($notes) {
+    $this->notes = $notes;
+  }
+
+
+
+
+
   public function renderHTML() {
     $result = '';
+
+    foreach ($this->notes as $index => $note) {
+      $result .= '<li class="unsaved"><div class="title">Unsaved bookmark</div><div class="description">' . $note . '</div></li>' . "\n";
+    }
 
     foreach ($this->structure as $item) {
 

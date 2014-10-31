@@ -1,5 +1,6 @@
 body {
   font-family: sans-serif;
+
 }
 
 #bookmarkslist {
@@ -14,6 +15,14 @@ body {
   border-style: solid;
   min-width: 320px;
   max-width: 400px;
+}
+
+#bookmarkslist li.unsaved {
+  background-color: orange;
+}
+
+div.title {
+  font-weight: bold;
 }
 
 li.tag {
