@@ -191,6 +191,13 @@ function addErrorToErrorBar(errorMessage, errorMessageId) {
     errorMessage = "undefined error message!";
     errorMessageId = $.md5(errorMessage);
   }
+  
+  // check whether the error message id is already displayed
+  if ($("#" + errorMessageId).length == 1) {
+    // this error message is already displayed
+    return;
+  }
+
   var closeSnippet = " <span class=\"errormessageclosebutton\" onclick=\"removeErrorMessage('" + errorMessageId + "')\">[x]</span>";
   $("#errorbar").append("<li id=\"" + errorMessageId + "\">" + errorMessage + closeSnippet + "</li>");
 }

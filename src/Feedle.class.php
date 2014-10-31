@@ -476,7 +476,7 @@ class Feedle {
       "<ul id=\"feedlist\">\n" .
       $feeds->renderHTML() .
       "</ul>\n" .
-      "<input id=\"errortester\" value=\"Some error message\"/><button onclick=\"addErrorToErrorBar($('#errortester').val(), $.md5($('#errortester').val()))\">Test this error message</button>";
+      "<form onsubmit=\"return false;\"><input id=\"errortester\" value=\"Some error message\"/><button onclick=\"addErrorToErrorBar($('#errortester').val(), $.md5($('#errortester').val()))\">Test this error message</button></form>";
     return Feedle::displayPage($title, $favicon, $appleTouchIcon, $content, $timestamp);
   }
 }
