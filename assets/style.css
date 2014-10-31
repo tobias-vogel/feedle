@@ -1,3 +1,7 @@
+body {
+  font-family: sans-serif;
+}
+
 #bookmarkslist {
   list-style: none;
   padding-left: 0px;
@@ -21,8 +25,19 @@ li div.hyperlink a, li div.title {
   word-wrap: break-word;
 }
 
+/*
 ul.error {
-  color: red;
+  color: green;
+}
+*/
+
+#errorbar li {
+  margin-top: 0px;
+  margin-left: 0px;
+}
+
+li {
+  margin-top: 10px;
 }
 
 #errorbar {
@@ -46,4 +61,32 @@ ul.error {
 
 li.feed div.title:before {
   content: url(feed.ico);
+}
+
+a.button {
+  /*cursor: pointer;*/
+  padding: 5px;
+  border-style: solid;
+  border-color: gray;
+  border-width: thin;
+  border-radius: 5px;
+  background-color: lightgray;
+  text-decoration: none;
+  color: black;
+
+  display: block;
+  float: left;
+}
+
+div.clear-block {
+/*  display: block;*/
+  overflow: hidden;
+  width: 100%;
+}
+
+a.button:hover {
+  background-color: gray;
+}
+
+a.button img {
 }
