@@ -210,7 +210,7 @@ function openRandomFeedItem() {
   var feedItems = $("a.newtabbablehref");
   var randomIndex = pickRandomNumber(feedItems.length);
   var feedItem = feedItems[randomIndex];
-  lastRandomlySelectedFeedItemId = feedItem.parentNode.id;
+  lastRandomlySelectedFeedItemId = feedItem.parentNode.parentNode.id;
   var href = feedItem.href;
   window.open(href);
 }
