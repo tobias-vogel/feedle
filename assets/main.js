@@ -129,6 +129,9 @@ function updateFeedContents(feedid, response, httpStatus) {
 }
 
 function archiveFeedItem(feedId, feedItemId) {
+  // get the feed item's title
+  var title = $("#" + feedId + "-" + feedItemId + " div a.newtabbablehref").text();
+
   // remove the feed item from the list
   $("#" + feedId + "-" + feedItemId).remove();
   hideFeedIfPossible(feedId);
@@ -145,6 +148,7 @@ function archiveFeedItem(feedId, feedItemId) {
         errorMessage = "The server could not be reached.";
       else
         errorMessage = xhr.responseText;//"Feed Item could not be removed (" + xhr + ", " + textStatus + ", " + errorThrown + ").";
+        errorMessage += " (" + title + ")";
       addErrorToErrorBar(errorMessage, $.md5(errorMessage));
     }
   });
