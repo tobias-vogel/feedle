@@ -1,7 +1,6 @@
 var timeout = 3000;
 
-//var autoUpdateFrequency = 60 * 1000;
-var autoUpdateFrequency = 10 * 1000;
+var autoUpdateFrequency = 60 * 1000;
 
 var windowHasFocus = true;
 
@@ -215,6 +214,9 @@ function removeErrorMessage(id) {
 
 function openRandomFeedItem() {
   var feedItems = $("a.newtabbablehref");
+  if (feedItems.length == 0)
+    return;
+
   var randomIndex = pickRandomNumber(feedItems.length);
   var feedItem = feedItems[randomIndex];
   lastRandomlySelectedFeedItemId = feedItem.parentNode.parentNode.id;
