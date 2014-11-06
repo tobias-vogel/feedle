@@ -1,5 +1,8 @@
 var timeout = 3000;
 
+//var autoUpdateFrequency = 60 * 1000;
+var autoUpdateFrequency = 10 * 1000;
+
 var windowHasFocus = true;
 
 var autoUpdateAllFeeds = false;
@@ -102,7 +105,7 @@ function refreshFeed(feedid, async, displayUpdatedDataOnlyWhenWindowInactive) {
 //      }
     },
     error: function (xhr, type, info) {
-//      updateFeedContents(feedid, xhr.responseText, xhr.status);
+      updateFeedContents(feedid, "", -1);
       var errorMessage = xhr.responseText;
       addErrorToErrorBar(errorMessage, $.md5(errorMessage));
     }
@@ -266,7 +269,7 @@ function autoUpdateAllFeedsPacemaker() {
   }
 
   // call this method over and over again (but it does nothing, if the flag is not set)
-  window.setTimeout(function() {autoUpdateAllFeedsPacemaker();}, 60 * 1000);
+  window.setTimeout(function() {autoUpdateAllFeedsPacemaker();}, autoUpdateFrequency);
 }
 
 window.onload = function() {
