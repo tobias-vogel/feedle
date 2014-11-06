@@ -208,18 +208,37 @@ class Feedle {
       $iniFile = 'cache/feeds/' . $feedid . '/meta.ini';
       $data = parse_ini_file($iniFile);
 
-      // use CURL to fetch the feed's contents (necessary, because file_get_contents and simplepie cannot handle HTTP authorization)
-      $ch = curl_init();
-      curl_setopt($ch, CURLOPT_URL, $data['uri']);
-      curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-      curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-      curl_setopt($ch, CURLOPT_USERAGENT, 'something not on a blacklist');
-      // provide a (possibly empty, does not harm) password
-      curl_setopt($ch, CURLOPT_USERPWD, $data['username'] . ':' . $data['password']);
-      $feedBody = curl_exec($ch);
-      $inspectionResult = curl_getinfo($ch);
-      $httpCode = $inspectionResult['http_code'];
-      curl_close($ch);
+
+      $uri =  $data['uri'];
+
+      // first try
+      do {
+        // use CURL to fetch the feed's contents (necessary, because file_get_contents and simplepie cannot handle HTTP authorization)
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $uri);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'something not on a blacklist');
+        // provide a (possibly empty, does not harm) password
+        curl_setopt($ch, CURLOPT_USERPWD, $data['username'] . ':' . $data['password']);
+        $feedBody = curl_exec($ch);
+        $inspectionResult = curl_getinfo($ch);
+        $httpCode = $inspectionResult['http_code'];
+        curl_close($ch);
+
+        $tryAgain = false;
+        if ($httpCode != 0) {
+          // request did work somehow, even if the page was not found
+          // do nothing and exit loop
+        }
+        else {
+          // request did not work (possibly due to HTTPS certificate stuff)
+          // retry it without https (if this was the reason)
+          $uri = preg_replace("/^https:/", "http:", $uri);
+          $tryAgain = true;
+        }
+      } while ($tryAgain);
+
       if ($httpCode == 200) {
         require_once('lib/simplepie/autoloader.php');
         $simplePie = new SimplePie();
