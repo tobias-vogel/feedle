@@ -45,6 +45,15 @@ ul.error {
   margin-left: 0px;
 }
 
+#feedlist {
+  padding-left: 0px;
+
+}
+
+#feedlist li div ul {
+  padding-left: 10px;
+}
+
 li {
   margin-top: 10px;
 }
