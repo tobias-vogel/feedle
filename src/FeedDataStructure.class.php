@@ -59,7 +59,7 @@ class FeedDataStructure {
 
     foreach ($files as $file) {
       $data = parse_ini_file($feedContentDirectoryName . '/' . $file);
-      $result .= '      <li id="' . $feedId . '-' . $data['timestampid'] . '"><div class="clear-block"><a class="button" href="#" onclick="archiveFeedItem(\'' . $feedId . '\', \'' . $data['timestampid'] . '\'); return false;"><img src="assets/recycle.png" alt="activity indicator"/></a> ' . (file_exists('cache/feeds/' . $feedId . '/favicon.ico') ? '<img width="16" src="cache/feeds/' . $feedId . '/favicon.ico" alt="favicon for this feed"/>' : '') . ' <a href="' . $data['uri'] . '" class="newtabbablehref" target="_blank">' . stripcslashes($data['title']) . '</a></div></li>' . "\n";
+      $result .= '      <li class="feeditem" id="' . $feedId . '-' . $data['timestampid'] . '"><div class="clear-block"><a class="button" href="#" onclick="archiveFeedItem(\'' . $feedId . '\', \'' . $data['timestampid'] . '\'); return false;"><img src="assets/recycle.png" alt="activity indicator"/></a> ' . (file_exists('cache/feeds/' . $feedId . '/favicon.ico') ? '<img width="16" src="cache/feeds/' . $feedId . '/favicon.ico" alt="favicon for this feed"/>' : '') . ' <a href="' . $data['uri'] . '" class="newtabbablehref" target="_blank">' . stripcslashes($data['title']) . '</a></div></li>' . "\n";
     }
 
 /*  else {

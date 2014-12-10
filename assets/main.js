@@ -128,6 +128,8 @@ function updateFeedContents(feedid, response, httpStatus) {
     $("#" + feedid + " div ul").removeAttr("class"); // in case there was an error, earlier, that should be removed now
   else
     $("#" + feedid + " div ul").prop("class", "error");
+
+  updateFeedItemNumber();
 }
 
 function archiveFeedItem(feedId, feedItemId) {
@@ -137,6 +139,8 @@ function archiveFeedItem(feedId, feedItemId) {
   // remove the feed item from the list
   $("#" + feedId + "-" + feedItemId).remove();
   hideFeedIfPossible(feedId);
+
+  updateFeedItemNumber();
 
   // ajax: move item to the archive
   $.ajax({
@@ -150,8 +154,9 @@ function archiveFeedItem(feedId, feedItemId) {
         errorMessage = "The server could not be reached.";
       else
         errorMessage = xhr.responseText;//"Feed Item could not be removed (" + xhr + ", " + textStatus + ", " + errorThrown + ").";
-        errorMessage += " (" + title + ")";
+      errorMessage += " (" + title + ")";
       addErrorToErrorBar(errorMessage, $.md5(errorMessage));
+      updateFeedItemNumber();
     }
   });
 }
@@ -222,6 +227,8 @@ function openRandomFeedItem() {
   lastRandomlySelectedFeedItemId = feedItem.parentNode.parentNode.id;
   var href = feedItem.href;
   window.open(href);
+
+  updateFeedItemNumber();
 }
 
 function openRandomFeedItemAndRemovePreviousRandomFeedItem() {
@@ -276,4 +283,10 @@ function autoUpdateAllFeedsPacemaker() {
 
 window.onload = function() {
   autoUpdateAllFeedsPacemaker();
+  updateFeedItemNumber();
+}
+
+function updateFeedItemNumber() {
+  var numberOfFeedItems = $(".feeditem").length;
+  $("#feedcounter").text(numberOfFeedItems + " unread feed item(s)");
 }
