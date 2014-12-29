@@ -1,6 +1,8 @@
 <?php
 class BookmarkDataStructure {
-  private $structure = array();
+  private $id2folderLookup = array();
+  private $id2bookmarkLookup = array();
+  private $roots = array();
   private $timestamp;
   private $notes;
 
@@ -16,14 +18,32 @@ class BookmarkDataStructure {
 
 
 
-  public function addBookmark($name, $hyperlink, $description, $tags, $isFeed = false) {
-    $bookmark = array();
-    $bookmark['name'] = $name;
-    $bookmark['hyperlink'] = $hyperlink;
-    $bookmark['description'] = $description;
-    $bookmark['tags'] = $tags;
-    $bookmark['isFeed'] = $isFeed;
-    $this->structure []= $bookmark;
+  public function addBookmark($id, $parentId, $name, $description, $hyperlink, $tags, $isFeed = false) {
+    if ($isFeed) {
+      $bookmark = new BookmarkFeed($id, $name, $description, $hyperlink, $tags);
+    }
+    else {
+      $bookmark = new BookmarkItem($id, $name, $description, $hyperlink, $tags);
+    }
+
+    if ($parentId == 'places')
+      $this->roots []= $bookmark;
+
+    $this->id2bookmarkLookup[$id] = $bookmark;
+  }
+  
+  
+  
+  
+  
+  public function addFolder($id, $parentId, $name, $description, $children) {
+    $folder = new BookmarkFolder($id, $name, $description, $children);
+
+    if ($parentId == 'places')
+      $this->roots []= $folder;
+
+    $this->id2folderLookup[$id] = $folder;
+    $this->id2bookmarkLookup[$id] = $folder;
   }
 
 
@@ -39,28 +59,38 @@ class BookmarkDataStructure {
 
 
   public function renderHTML() {
+    $this->replaceIdStringsByObjects();
+
     $result = '';
 
     foreach ($this->notes as $index => $note) {
       $result .= '<li class="unsaved"><div class="title">Unsaved bookmark</div><div class="description">' . $note . '</div></li>' . "\n";
     }
 
-    foreach ($this->structure as $item) {
-
-      $result .= '<li' . ($item['isFeed'] ? ' class="feed"' : '') . '>' . "\n";
-      $result .= '  <div class="title">' .  $item['name'] . "</div>\n";
-      $result .= '  <div class="hyperlink"><a href="' . $item['hyperlink'] . '"  class="newtabbablehref" target="_blank">' . $item['hyperlink'] . "</a></div>\n";
-      $result .= '  <ul class="tags">' . "\n";
-      if (count($item['tags']) > 0) {
-        foreach ($item['tags'] as $tag) {
-          $result .= '    <li class="tag">' . $tag . "</li>\n";
-        }
-      }
-      $result .= "  </ul>\n";
-      $result .= '  <div class="description">' . $item['description'] . "</div>\n";
-      $result .= "</li>\n";
+    $newResult = '';
+    foreach ($this->roots as $bookmark) {
+      $newResult .= $bookmark->toHtml();
     }
+    $result = $newResult;
     return $result;
+  }
+
+
+
+
+
+  public function printFolderStructureRecursively($bookmarkList) {
+    $resultString = '<ul>';
+    foreach ($bookmarkList as $bookmark) {
+      $resultString .= '<li>';
+      $resultString .= $bookmark->getName();
+      if ($bookmark instanceof BookmarkFolder) {
+        $resultString .= self::printFolderStructureRecursively($bookmark->getChildren());
+      }
+      $resultString .= '</li>';
+    }
+    $resultString .= '</ul>';
+    return $resultString;
   }
 
 
@@ -69,6 +99,23 @@ class BookmarkDataStructure {
 
   public function getTimestamp() {
     return strftime('%c', $this->timestamp);
+  }
+
+
+
+
+
+  private function replaceIdStringsByObjects() {
+    // iteratively replace all the children strings by their corresponding objects in all folders
+    foreach ($this->id2folderLookup as $id => $folder) {
+      $childrenIds = $folder->getChildren();
+      $objectifiedChildren = array();
+      foreach ($childrenIds as $childId) {
+        $child = $this->id2bookmarkLookup[$childId];
+        $objectifiedChildren []= $child;
+      }
+      $folder->setChildren($objectifiedChildren);
+    }
   }
 }
 ?>

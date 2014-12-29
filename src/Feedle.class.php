@@ -2,6 +2,9 @@
 require_once('src/ConfigLoader.class.php');
 require_once('src/ConfigurationNotFoundException.class.php');
 require_once('src/BookmarkDataStructure.class.php');
+require_once('src/BookmarkItem.class.php');
+require_once('src/BookmarkFeed.class.php');
+require_once('src/BookmarkFolder.class.php');
 require_once('src/FeedDataStructure.class.php');
 
 class Feedle {
@@ -27,11 +30,6 @@ class Feedle {
         Feedle::storeANote($parameters);
       }
     }
-    //else {
-    //  // just display the (possibly) cached bookmarks together with the whole page
-    //  list($bookmarks, $feeds) = Feedle::readBookmarksFromCache();
-    //  self::displayPage($bookmarks, $feeds);
-    //}
   }
 
 
@@ -102,25 +100,39 @@ class Feedle {
 
     if ($json != null) {
       foreach (json_decode($json, true) as $entry) {
-
-        // only consider entries that actually are bookmarks or feeds
-        if ($entry['type'] == 'bookmark' or $entry['type'] == 'livemark') {
+        $type = $entry['type'];
+        // only consider entries that actually are bookmarks, feeds, or folders
+        if (!(
+          $type == 'bookmark' or
+          $type == 'livemark' or
+          $type == 'folder'))
+          {
+            // ignore this type of bookmark, it is a query, (deleted) item, or separator
+            continue;
+        }
+        else {
           $name = $entry['title'];
-          $description = $entry['description'];
+          $description = $entry['description'] == NULL ? '' : $entry['description'];
+          $parentId = $entry['parentid'];
+          $id = $entry['id'];
 
-          if ($entry['type'] == 'bookmark') {
+          if ($type == 'bookmark') {
             // read all bookmark specific details
             $hyperlink = $entry['bmkUri'];
             // merge tags and keywords (what's the difference?)
             $tags = array_merge(count($entry['tags']) > 0 ? explode(' ', implode(' ', $entry['tags'])) : array(), ($entry['keyword'] == null ? array() : explode(' ', $entry['keyword'])));
 
             // add this bookmark
-            $bds->addBookmark($name, $hyperlink, $description, $tags);
+            $bds->addBookmark($id, $parentId, $name, $description, $hyperlink, $tags);
+          }
+          else if ($type == 'folder') {
+            $children = $entry['children'];
+            $bds->addFolder($id, $parentId, $name, $description, $children);
+            
           }
           else {
             // read all feed specific details
             $feedUri = $entry['feedUri'];
-            $id = $entry['id'];
 
             // add this feed
             $fds->addFeed($id, $name, $feedUri);
@@ -138,7 +150,7 @@ class Feedle {
             }
 
             // add this feed as a bookmark, too
-            $bds->addBookmark($name, $feedUri, $description, array(), true);
+            $bds->addBookmark($id, $parentId, $name, $description, $feedUri, array(), true);
           }
         }
       }
@@ -186,7 +198,6 @@ class Feedle {
 
   private static function readBookmarksFromWebAndSaveIt($configuration) {
     // start a process that does query the sync server
-//    $command = "rm cache/.completed; touch cache/.inprogress && lib/fxa-sync-client/bin/sync-cli.js -e " . $configuration['email'] . " -p " . $configuration['password'] . " -t bookmarks | sed -n -E -e '/::bookmarks::/,$ p' - | sed '1 d' > cache/bookmarks.json && touch cache/.completed && rm cache/.inprogress";
     $command = "touch cache/bookmarks.json.lock && lib/fxa-sync-client/bin/sync-cli.js -e " . $configuration['email'] . " -p " . $configuration['password'] . " -t bookmarks | sed -n -E -e '/::bookmarks::/,$ p' - | sed '1 d' > cache/bookmarks.json && rm cache/bookmarks.json.lock";
     exec($command);
   }
@@ -254,7 +265,6 @@ class Feedle {
 
         // save the items to file (unless they are already in the archive)
         foreach ($items as $item) {
-          #$safeId = preg_replace('/[^a-zA-Z0-9]/', "", $item['id']);
           $safeId = $item['timestamp'];
           $itemfilename = 'cache/feeds/' . $feedid . '/' . $safeId;
           $itemInArchiveFilename = 'cache/feeds/' . $feedid . '/archive/' . $safeId;
@@ -269,7 +279,6 @@ class Feedle {
         if (rand(1, 10) == 10) {
           // get homepage from feed
           // do not use simplepie for that, it's currently broken or at least there is now way to fetch the <link> of the <channel>
-          //$homepage = $simplePie->get_link();
           preg_match('/<channel>.*?<link>.*?(?=<\/link>)/s', $feedBody, $match);
           $match = $match[0];
           $homepage = preg_replace('/<channel>.*?<link>/s', '', $match);
@@ -489,8 +498,6 @@ class Feedle {
     $result .= "    <p><button id=\"updatebutton\" onclick=\"updateBookmarks()\">Retrieve updated sync data</button><span style=\"display: none\" id=\"activity\"> <img src=\"assets/loader.gif\" alt=\"activity indicator\"/></span></p>\n";
     $result .= "    <p>Updated: " . $timestamp . "</p>\n";
     $result .= "    <p><a href=\"bookmarks.php\">Bookmarks</a> <a href=\"feeds.php\">Feeds</a></p>\n";
-//    $result .= "    <span onclick="activateBookmarksTab()">Bookmarks</span>\n";
-//    $result .= "    <span onclick="activateFeedsTab()">Feeds</span>\n";
     $result .= "    <p><input type=\"checkbox\" id=\"openinnewtabtoggle\" onclick=\"toggleOpenInNewTab();\" checked=\"checked\"><label for=\"openinnewtabtoggle\">Open links in new Tab</label></p>\n";
     $result .= "    <div>\n";
     $result .= "      <h1>$title</h1>\n";
@@ -540,4 +547,3 @@ class Feedle {
     return Feedle::displayPage($title, $favicon, $appleTouchIcon, $content, $timestamp);
   }
 }
-?>

@@ -1,21 +1,44 @@
+/* common style */
 body {
   font-family: sans-serif;
-
 }
 
-#bookmarkslist {
+
+
+
+
+
+/* bookmark-related styles */
+
+
+.bookmarkItem, .bookmarkFolder {
   list-style: none;
-  padding-left: 0px;
-}
-
-#bookmarkslist li {
   margin-bottom: 20px;
   border-color: black;
   border-width: thin;
   border-style: solid;
-  min-width: 320px;
-  max-width: 400px;
+/*  min-width: 320px;
+  max-width: 400px;*/
 }
+
+.bookmarkItem {
+  background-color: lightgray;
+ }
+
+.bookmarkFolder {
+  background-color: gray;
+}
+
+
+
+
+
+
+
+
+
+
+
 
 #bookmarkslist li.unsaved {
   background-color: orange;
@@ -108,3 +131,10 @@ a.button:hover {
 
 a.button img {
 }
+
+/*
+#bookmarkslist {
+  list-style: none;
+  padding-left: 0px;
+}
+*/
