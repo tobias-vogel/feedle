@@ -280,9 +280,14 @@ class Feedle {
           // get homepage from feed
           // do not use simplepie for that, it's currently broken or at least there is now way to fetch the <link> of the <channel>
           preg_match('/<channel>.*?<link>.*?(?=<\/link>)/s', $feedBody, $match);
-          $match = $match[0];
-          $homepage = preg_replace('/<channel>.*?<link>/s', '', $match);
-          Feedle::downloadFavicon($data, $feedid, $homepage);
+          if (empty($match)) {
+            // the feed did not contain a channel tag or a link tag whatsoever, so we need to go on without favicon
+          }
+          else {
+            $match = $match[0];
+            $homepage = preg_replace('/<channel>.*?<link>/s', '', $match);
+            Feedle::downloadFavicon($data, $feedid, $homepage);
+          }
         }
 
         // render the feed contents
