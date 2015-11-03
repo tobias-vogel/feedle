@@ -28,7 +28,7 @@ git clone https://github.com/tobias-vogel/feedle.git .
 
 For the webserver to write cached files, the cache directory access rights have to be changed appropriately.
 
-cd chmod o+w cache
+chmod o+w cache
 
 Now we start with the (not too) tough part. 
 Feedle needs client functionality to connect to firefox sync. This functionality is provided by the github tool "fxa-sync-client" written by Edwin Wong (edmoz).
