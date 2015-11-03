@@ -52,7 +52,7 @@ Node.js should now work. The following command should print the version:
 
 node -v
 
-If it did not work, download a pre-compiled v0.10.29 release from http://nodejs.org/dist/v0.10.29/, extract it and you are done.
+If it did not work, download a pre-compiled v0.10.29 release from http://nodejs.org/dist/v0.10.29/, extract it and you are done. (Or use the version that some error message suggests.)
 
 The tutorial I used (https://ariejan.net/2011/10/24/installing-node-js-and-npm-on-ubuntu-debian/) says that npm also needs to be installed. For unknown reasons, not in my case.
 Try npm with the following command, which should print the version:
@@ -74,6 +74,10 @@ You are now ready to install (i.e., configure) fxa-sync-client.
 
 cd ../fxa-sync-client
 sudo ../node.js/bin/npm install #npm might (only) work without the path
+
+It might complain about a missing gmp.h file. Get it by installing
+
+sudo apt-get install libgmp3-dev
 
 When the installation succeeded, try the following command from /lib/fxa-sync-client/bin using your firefox sync credentials (It should give you a longly output, ending with a lot of json containing your bookmarks.):
 
