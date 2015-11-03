@@ -52,7 +52,7 @@ Node.js should now work. The following command should print the version:
 
 node -v
 
-If it did not work, download a pre-compiled v0.10.29 release from http://nodejs.org/dist/v0.10.29/, extract it and you are done. (Or use the version that some error message suggests.)
+If it did not work, download a pre-compiled v0.10.29 release from http://nodejs.org/dist/v0.10.29/, extract it to locally-installed-node.js-version/ and you are done. (Or use the version that some error message suggests.)
 
 The tutorial I used (https://ariejan.net/2011/10/24/installing-node-js-and-npm-on-ubuntu-debian/) says that npm also needs to be installed. For unknown reasons, not in my case.
 Try npm with the following command, which should print the version:
@@ -82,6 +82,9 @@ sudo apt-get install libgmp3-dev
 When the installation succeeded, try the following command from /lib/fxa-sync-client/bin using your firefox sync credentials (It should give you a longly output, ending with a lot of json containing your bookmarks.):
 
 bin/sync-cli.js -e myemailaddress -p mypassword -t bookmarks
+
+If this does not work, run sync-cli.js with the currently (manually) installed node.js version like so:
+../locally-installed-node.js-version/bin/node bin/sync-cli.js -e myemailaddress -p mypassword -t bookmarks
 
 Put your sync credentials in a file called /config/credentials.ini:
 email = youremail
